@@ -19,8 +19,14 @@ app.use("/", express.static(path.join(__dirname, "../dist/nodebucket")));
 const PORT = 3000 || process.env.PORT;
 
 // TODO: This line will be replaced with your database connection string (including username/password).
-const CONN =
-  "mongodb+srv://superadmin:s3cret@cluster0-lujih.mongodb.net/nodebucket?retryWrites=true&w=majority";
+// const CONN =
+//   "mongodb+srv://superadmin:s3cret@cluster0-lujih.mongodb.net/nodebucket?retryWrites=true&w=majority";
+
+// database connection string
+const db_username = "nodebucket_user";
+const db_password = "kl9DpuKH7Dqgkw7V";
+const db_name = "nodebucket";
+const CONN = `mongodb+srv://${db_username}:${db_password}@buwebdev-cluster-1.gfevl.mongodb.net/${db_name}?retryWrites=true&w=majority`;
 
 /**
  * Database connection.
