@@ -1,35 +1,47 @@
-<div fxLayout="column">
-
+<header>
   <!-- navigation -->
   <nav fxFlex>
-    <mat-toolbar>
+    <mat-toolbar style="border-bottom: 15px solid #D6A800; height: 100px;" color="primary">
       <!-- navbar container -->
       <div class="navbar-container">
         <!-- logo -->
-        <button class="logo" routerLink="/" mat-button>nodebucket</button>
+        <button mat-button class="logo" routerLink="/">nodebucket</button>
+        <button mat-button class="navbar-link">About</button>
+        <button mat-button class="navbar-link">Contact Us</button>
+      </div>
 
-        <button class="navbar-link" routerLink="/" mat-button>Home</button>
-        <button class="navbar-link" mat-button>About</button>
+      <div fxFlex></div>
+
+      <div>
+        <button mat-icon-button [matMenuTriggerFor]="profileMenu" aria-label="User profile menu">
+          <mat-icon>perm_identity</mat-icon>
+        </button>
+
+        <!-- https://material.angular.io/components/menu -->
+        <mat-menu #profileMenu>
+          <p style="padding: 10px; font-size: 16px; font-weight: lighter;">Logged in as {{ sessionName }}</p>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Log out</span>
+          </button>
+        </mat-menu>
       </div>
 
     </mat-toolbar>
   </nav>
+</header>
 
-  <!-- main content -->
-  <div fxFlex>
-    <main class="main-content" fxFlex="100%;">
-      <router-outlet></router-outlet>
-    </main>
-  </div>
-
-  <!-- footer -->
-  <div fxFlex>
-    <footer class="footer">
-      <mat-toolbar class="footer-content">
-        <p>
-          &copy; {{year | date: 'yyyy'}} - nodebucket - <a href="https://www.bellevue.edu/" class="bu-link" target="_blank">Bellevue University</a>
-        </p>
-      </mat-toolbar>
-    </footer>
-  </div>
+<!-- main content -->
+<div class="content">
+  <router-outlet></router-outlet>
 </div>
+
+<!-- footer -->
+<footer>
+  <mat-toolbar class="footer-content">
+    <div fxFlex></div>
+    <p>
+      &copy; {{year | date: 'yyyy'}} - nodebucket - <a href="https://www.bellevue.edu/" class="bu-link" target="_blank">Bellevue University</a>
+    </p>
+  </mat-toolbar>
+</footer>
