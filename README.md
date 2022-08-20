@@ -33,6 +33,12 @@ Install [Angular Flex-Layout](https://github.com/angular/flex-layout) ([wiki](ht
 npm i @angular/flex-layout
 ```
 
+Install [Concurrently](https://github.com/open-cli-tools/concurrently) to run/watch multiple scripts better
+
+```bash
+npm i -D concurrently
+```
+
 ---
 
 [Default Angular component css display block](https://stackoverflow.com/questions/51032328/angular-component-default-style-css-display-block) (generated components will contain css `:host { display: block; }`)
