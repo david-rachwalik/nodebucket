@@ -4,6 +4,13 @@
 
 WEB 450 - Mastering the MEAN Stack Bootcamp (Bellevue University)
 
+Bellevue University | Web Development [Degree](http://www.bellevue.edu/degrees/bachelor/web-development-bs 'Designed by developers for developers.')
+
+## Contributors
+
+- Richard Krasso
+- David Rachwalik
+
 ### Project Commands Used
 
 Generate a new [Angular](https://angular.io) application
@@ -31,6 +38,12 @@ Install [Angular Flex-Layout](https://github.com/angular/flex-layout) ([wiki](ht
 
 ```bash
 npm i @angular/flex-layout
+```
+
+Install [Swagger](https://swagger.io) for use with [MongoDB](https://www.mongodb.com/docs)
+
+```bash
+npm i swagger-jsdoc swagger-ui-express
 ```
 
 Install [Concurrently](https://github.com/open-cli-tools/concurrently) to run/watch multiple scripts better
