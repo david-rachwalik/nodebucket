@@ -1,0 +1,43 @@
+<div fxLayout="column">
+    <mat-card fxFlex class="login-container">
+        <mat-card-header>
+            <mat-card-title class="login-title">
+                Employee Login Page
+            </mat-card-title>
+            <br />
+
+            <mat-card-subtitle class="login-subtitle">
+                You must enter a valid empId to continue.
+            </mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+            <p-messages [(value)]="errorMessages" [enableService]="false"></p-messages>
+
+            <mat-card class="mat-elevation-z0" fxLayout="column" fxLayoutGap="10px">
+                <form [formGroup]="loginForm" (ngSubmit)="login(); loginForm.reset();">
+                    <mat-card-content class="mat-elevation-z0">
+                        <mat-form-field appearance="fill" style="width: 100%;">
+                            <input matInput formControlName="empId" placeholder="Employee ID" />
+
+                            <mat-error *ngIf="loginForm.controls['empId'].hasError('required') && loginForm.controls['empId'].touched">
+                                Employee ID is a required field.
+                            </mat-error>
+
+                            <mat-error *ngIf="loginForm.controls['empId'].hasError('pattern') && loginForm.controls['empId'].touched">
+                                Employee ID must be a numerical value.
+                            </mat-error>
+                        </mat-form-field>
+                    </mat-card-content>
+
+                    <mat-card-actions>
+                        <button mat-raised-button fxFlex type="submit" [disabled]="!loginForm.valid" color="primary" style="height: 50px; font-size: 18px;">
+                            Login
+                        </button>
+                    </mat-card-actions>
+                </form>
+            </mat-card>
+
+        </mat-card-content>
+    </mat-card>
+</div>

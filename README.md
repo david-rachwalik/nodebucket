@@ -1,27 +1,83 @@
-# Nodebucket
+# nodebucket
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.0.5.
+## Web App ([repo](https://github.com/david-rachwalik/nodebucket))
 
-## Development server
+WEB 450 - Mastering the MEAN Stack Bootcamp (Bellevue University)
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+Bellevue University | Web Development [Degree](http://www.bellevue.edu/degrees/bachelor/web-development-bs 'Designed by developers for developers.')
 
-## Code scaffolding
+## Contributors
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+- Richard Krasso
+- David Rachwalik
 
-## Build
+### Project Commands Used
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Generate a new [Angular](https://angular.io) application
 
-## Running unit tests
+```bash
+ng new <app-name>
+```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Install linting & Prettier
 
-## Running end-to-end tests
+```bash
+npm i -D eslint prettier
+npm i -D eslint-config-airbnb eslint-config-airbnb-typescript
+npm i -D eslint-config-prettier eslint-plugin-prettier eslint-plugin-html
+npm i -D @typescript-eslint/eslint-plugin @typescript-eslint/parser
+```
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+Install Angular Material ("custom" theme, 'y' typography, 'y' animations) ([background](https://material.angular.io/guide/theming#application-background-color))
 
-## Further help
+```bash
+ng add @angular/material
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Install [Angular Flex-Layout](https://github.com/angular/flex-layout) ([wiki](https://github.com/angular/flex-layout/wiki), [API](https://github.com/angular/flex-layout/wiki/API-Documentation))
+
+```bash
+npm i @angular/flex-layout
+```
+
+Install [Swagger](https://swagger.io) for use with [MongoDB](https://www.mongodb.com/docs)
+
+```bash
+npm i swagger-jsdoc swagger-ui-express
+```
+
+Install [Concurrently](https://github.com/open-cli-tools/concurrently) to run/watch multiple scripts better
+
+```bash
+npm i -D concurrently
+```
+
+---
+
+[Default Angular component css display block](https://stackoverflow.com/questions/51032328/angular-component-default-style-css-display-block) (generated components will contain css `:host { display: block; }`)
+
+```json
+...
+// Set default value in angular.json (Angular v9.1+)
+"projectType": "application",
+"schematics": {
+  "@schematics/angular:component": {
+    "displayBlock": true
+  }
+}
+...
+```
+
+### Angular Generate Commands Used
+
+Generate a new Angular component
+
+```bash
+ng g c <component-name>
+```
+
+Generate a new Angular module
+
+```bash
+ng g m <module-name>
+```

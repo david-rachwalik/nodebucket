@@ -1,32 +1,34 @@
+/*
+============================================
+; Title:        app.module.ts
+; Author:       David Rachwalik
+; Date:         2022/08/17
+; Description:  Core app module
+;===========================================
+*/
+
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
-import { FlexLayoutModule } from '@angular/flex-layout';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { HomeComponent } from './pages/home/home.component';
-import { AuthLayoutComponent } from './shared/auth-layout/auth-layout.component';
-import { BaseLayoutComponent } from './shared/base-layout/base-layout.component';
+import { SharedModule } from './shared/shared.module';
+
+// Only import [BrowserModule, BrowserAnimationsModule] once
+// All other shared/feature modules will import [CommonModule]
+// https://dev.to/sanketmaru/import-once-browser-module-1pie
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    HomeComponent,
-    AuthLayoutComponent,
-    BaseLayoutComponent,
-  ],
+  declarations: [AppComponent],
   imports: [
-    BrowserModule,
     AppRoutingModule,
+    BrowserModule,
     BrowserAnimationsModule,
-    FlexLayoutModule,
-    MatToolbarModule,
-    MatButtonModule,
-    MatIconModule,
+    // import HttpClientModule after BrowserModule (https://angular.io/guide/http)
+    HttpClientModule,
+    SharedModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
