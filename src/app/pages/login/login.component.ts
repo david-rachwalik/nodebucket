@@ -41,13 +41,13 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private cookieService: CookieService,
-    private sessionService: SessionService
+    private sessionService: SessionService,
   ) {
     this.employee = {} as Employee;
   }
   intercept(
     req: HttpRequest<any>,
-    next: HttpHandler
+    next: HttpHandler,
   ): Observable<HttpEvent<any>> {
     throw new Error('Method not implemented.');
   }
@@ -70,14 +70,14 @@ export class LoginComponent implements OnInit {
           this.cookieService.set(
             'session_user',
             this.employee.empId.toString(),
-            1
+            1,
           );
 
           // Save 'session_name' in cookie for a day
           this.cookieService.set(
             'session_name',
             `${this.employee.firstName} ${this.employee.lastName}`,
-            1
+            1,
           );
         } else {
           this.errorMessages = [

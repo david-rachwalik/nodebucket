@@ -7,10 +7,11 @@
 ;===========================================
 */
 
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose');
 
-let employeeSchema = new Schema(
+const { Schema } = mongoose;
+
+const employeeSchema = new Schema(
   {
     // empId: { type: Number, unique: true, required: true },
     empId: { type: String, unique: true, required: true },
@@ -18,7 +19,7 @@ let employeeSchema = new Schema(
     lastName: { type: String },
   },
   // Explicit collection naming
-  { collection: "employees" }
+  { collection: 'employees' },
 );
 
-module.exports = mongoose.model("Employee", employeeSchema);
+module.exports = mongoose.model('Employee', employeeSchema);
