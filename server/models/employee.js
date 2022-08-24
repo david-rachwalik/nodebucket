@@ -8,6 +8,7 @@
 */
 
 const mongoose = require('mongoose');
+const itemSchema = require('./item');
 
 const { Schema } = mongoose;
 
@@ -17,6 +18,8 @@ const employeeSchema = new Schema(
     empId: { type: String, unique: true, required: true },
     firstName: { type: String },
     lastName: { type: String },
+    todo: [itemSchema],
+    done: [itemSchema],
   },
   // Explicit collection naming
   { collection: 'employees' },
