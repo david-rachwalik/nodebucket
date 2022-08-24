@@ -49,13 +49,24 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../dist/nodebucket')));
 app.use('/', express.static(path.join(__dirname, '../dist/nodebucket')));
 
-// Configure OpenAPI/Swagger document library specification
+// Configure OpenAPI/Swagger document library specification (https://swagger.io/specification)
 const options = {
   definition: {
     openapi: '3.0.0',
     info: {
       title: 'nodebucket API',
       version: '1.0.0',
+      description:
+        'Project API for WEB 450 - Mastering the MEAN Stack Bootcamp (Bellevue University).',
+      contact: {
+        name: 'David Rachwalik',
+        url: 'https://david-rachwalik.github.io',
+      },
+      // https://soos.io/apache-vs-mit-license
+      license: {
+        name: 'Apache 2.0',
+        url: 'https://www.apache.org/licenses/LICENSE-2.0.html',
+      },
     },
   },
   apis: ['./server/routes/*.js'], // Files containing annotations for the OpenAPI Specification
