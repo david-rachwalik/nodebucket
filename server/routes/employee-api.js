@@ -290,4 +290,117 @@ router.delete('/:empId', async (req, res) => {
   }
 });
 
+// -------- Item Tasks --------
+
+/**
+ * findAllTasks
+ * @openapi
+ * /api/employees/{empId}/tasks:
+ *   get:
+ *     tags:
+ *       - Employees
+ *     summary: return a list of Employee task documents
+ *     description: API for returning an array of all Employee task documents.
+ *     parameters:
+ *       - name: empId
+ *         in: path
+ *         required: true
+ *         description: Employee document id
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Employee task documents.
+ *       '500':
+ *         description: Server Exception.
+ *       '501':
+ *         description: MongoDB Exception.
+ */
+router.get('/:empId/tasks', async (req, res) => {
+  try {
+    Employee.findOne(
+      { empId: req.params.empId },
+      'empId todo done',
+      (err, employee) => {
+        if (err) {
+          console.log(err);
+          res.status(501).send({
+            err: `MongoDB server error: ${err.message}`,
+          });
+        } else {
+          console.log(employee);
+          res.json(employee);
+        }
+      },
+    );
+  } catch (e) {
+    console.log(e);
+    res.status(500).send({
+      err: `Internal server error: ${e.message}`,
+    });
+  }
+});
+
+/**
+ * createTask
+ * @openapi
+ * /api/employees/{empId}/tasks:
+ *   post:
+ *     tags:
+ *       - Employees
+ *     summary: create an Employee task document
+ *     description: API for creating an Employee task document.
+ *     parameters:
+ *       - name: empId
+ *         in: path
+ *         required: true
+ *         description: Employee document id
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Employee task documents.
+ *       '500':
+ *         description: Server Exception.
+ *       '501':
+ *         description: MongoDB Exception.
+ */
+router.post('/:empId/tasks', async (req, res) => {
+  try {
+    Employee.findOne({ empId: req.params.empId }, (err, employee) => {
+      if (err) {
+        console.log(err);
+        res.status(501).send({
+          err: `MongoDB server error: ${err.message}`,
+        });
+      } else {
+        // Successfully found Employee document
+        console.log(employee);
+        // Generate new task and add to ToDos
+        const newTask = {
+          text: req.body.text,
+        };
+        employee.todo.push(newTask);
+        employee.save((error, updatedEmp) => {
+          if (error) {
+            console.log(error);
+            res.status(501).send({
+              err: `MongoDB server error: ${error.message}`,
+            });
+          } else {
+            // Successfully created document
+            console.log(updatedEmp);
+            res.json(updatedEmp);
+          }
+        });
+      }
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).send({
+      err: `Internal server error: ${e.message}`,
+    });
+  }
+});
+
 module.exports = router;
