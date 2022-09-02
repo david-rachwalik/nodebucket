@@ -8,8 +8,9 @@
 */
 
 const express = require('express');
+const Employee = require('../models/employee');
+
 const router = express.Router();
-const Employee = require('../models/employee.js');
 
 // -------- API --------
 
@@ -34,7 +35,7 @@ const Employee = require('../models/employee.js');
  */
 router.get('', async (req, res) => {
   try {
-    Employee.find({}, function (err, employees) {
+    Employee.find({}, (err, employees) => {
       if (err) {
         console.log(err);
         res.status(501).send({
@@ -80,7 +81,7 @@ router.get('', async (req, res) => {
  */
 router.get('/:empId', async (req, res) => {
   try {
-    Employee.findOne({ empId: req.params.empId }, function (err, employee) {
+    Employee.findOne({ empId: req.params.empId }, (err, employee) => {
       if (err) {
         console.log(err);
         res.status(501).send({
@@ -139,7 +140,7 @@ router.post('', async (req, res) => {
       lastName: req.body.lastName,
     };
 
-    Employee.create(newEmployee, function (err, employee) {
+    Employee.create(newEmployee, (err, employee) => {
       if (err) {
         console.log(err);
         res.status(501).send({
@@ -201,7 +202,7 @@ router.post('', async (req, res) => {
  */
 router.put('/:empId', async (req, res) => {
   try {
-    Employee.findOne({ empId: req.params.empId }, function (err, employee) {
+    Employee.findOne({ empId: req.params.empId }, (err, employee) => {
       if (err) {
         console.log(err);
         res.status(501).send({
@@ -217,9 +218,9 @@ router.put('/:empId', async (req, res) => {
             lastName: req.body.lastName,
           });
           // Commit the changes to database
-          employee.save(function (err, updatedEmployee) {
-            if (err) {
-              console.log(err);
+          employee.save((error, updatedEmployee) => {
+            if (error) {
+              console.log(error);
               res.json(updatedEmployee);
             } else {
               // Successfully updated document
@@ -269,25 +270,135 @@ router.put('/:empId', async (req, res) => {
  */
 router.delete('/:empId', async (req, res) => {
   try {
-    Employee.findByIdAndDelete(
+    Employee.findByIdAndDelete({ empId: req.params.empId }, (err, employee) => {
+      if (err) {
+        console.log(err);
+        res.status(501).send({
+          message: `MongoDB Exception: ${err.message}`,
+        });
+      } else {
+        // Successfully deleted document
+        console.log(employee);
+        res.json(employee);
+      }
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: `Server Exception: ${err.message}`,
+    });
+  }
+});
+
+// -------- Item Tasks --------
+
+/**
+ * findAllTasks
+ * @openapi
+ * /api/employees/{empId}/tasks:
+ *   get:
+ *     tags:
+ *       - Employees
+ *     summary: return a list of Employee task documents
+ *     description: API for returning an array of all Employee task documents.
+ *     parameters:
+ *       - name: empId
+ *         in: path
+ *         required: true
+ *         description: Employee document id
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Employee task documents.
+ *       '500':
+ *         description: Server Exception.
+ *       '501':
+ *         description: MongoDB Exception.
+ */
+router.get('/:empId/tasks', async (req, res) => {
+  try {
+    Employee.findOne(
       { empId: req.params.empId },
-      function (err, employee) {
+      'empId todo done',
+      (err, employee) => {
         if (err) {
           console.log(err);
           res.status(501).send({
-            message: `MongoDB Exception: ${err.message}`,
+            err: `MongoDB server error: ${err.message}`,
           });
         } else {
-          // Successfully deleted document
           console.log(employee);
           res.json(employee);
         }
       },
     );
-  } catch (err) {
-    console.log(err);
+  } catch (e) {
+    console.log(e);
     res.status(500).send({
-      message: `Server Exception: ${err.message}`,
+      err: `Internal server error: ${e.message}`,
+    });
+  }
+});
+
+/**
+ * createTask
+ * @openapi
+ * /api/employees/{empId}/tasks:
+ *   post:
+ *     tags:
+ *       - Employees
+ *     summary: create an Employee task document
+ *     description: API for creating an Employee task document.
+ *     parameters:
+ *       - name: empId
+ *         in: path
+ *         required: true
+ *         description: Employee document id
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Employee task documents.
+ *       '500':
+ *         description: Server Exception.
+ *       '501':
+ *         description: MongoDB Exception.
+ */
+router.post('/:empId/tasks', async (req, res) => {
+  try {
+    Employee.findOne({ empId: req.params.empId }, (err, employee) => {
+      if (err) {
+        console.log(err);
+        res.status(501).send({
+          err: `MongoDB server error: ${err.message}`,
+        });
+      } else {
+        // Successfully found Employee document
+        console.log(employee);
+        // Generate new task and add to ToDos
+        const newTask = {
+          text: req.body.text,
+        };
+        employee.todo.push(newTask);
+        employee.save((error, updatedEmp) => {
+          if (error) {
+            console.log(error);
+            res.status(501).send({
+              err: `MongoDB server error: ${error.message}`,
+            });
+          } else {
+            // Successfully created document
+            console.log(updatedEmp);
+            res.json(updatedEmp);
+          }
+        });
+      }
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).send({
+      err: `Internal server error: ${e.message}`,
     });
   }
 });

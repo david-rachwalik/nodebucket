@@ -7,18 +7,22 @@
 ;===========================================
 */
 
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+const itemSchema = require('./item');
 
-let employeeSchema = new Schema(
+const { Schema } = mongoose;
+
+const employeeSchema = new Schema(
   {
     // empId: { type: Number, unique: true, required: true },
     empId: { type: String, unique: true, required: true },
     firstName: { type: String },
     lastName: { type: String },
+    todo: [itemSchema],
+    done: [itemSchema],
   },
   // Explicit collection naming
-  { collection: "employees" }
+  { collection: 'employees' },
 );
 
-module.exports = mongoose.model("Employee", employeeSchema);
+module.exports = mongoose.model('Employee', employeeSchema);

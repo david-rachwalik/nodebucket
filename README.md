@@ -81,3 +81,9 @@ Generate a new Angular module
 ```bash
 ng g m <module-name>
 ```
+
+Generate a new Angular service
+
+```bash
+ng g s <service-name> --skip-tests
+```
