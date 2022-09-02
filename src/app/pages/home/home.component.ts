@@ -2,7 +2,7 @@
 ============================================
 ; Title:        home.component.ts
 ; Author:       David Rachwalik
-; Date:         2022/08/31
+; Date:         2022/09/02
 ; Description:  Home page component
 ;===========================================
 */
@@ -58,10 +58,9 @@ export class HomeComponent implements OnInit {
 
     this.taskService.findAllTasks(this.empId).subscribe({
       next: (res) => {
-        this.employee = res;
+        this.employee = res.data;
       },
       error: (e) => {
-        // console.log(e.message);
         console.log(e);
       },
       complete: () => {
@@ -79,7 +78,7 @@ export class HomeComponent implements OnInit {
 
     this.taskService.createTask(this.empId, newTask).subscribe({
       next: (res) => {
-        this.employee = res;
+        this.employee = res.data;
       },
       error: (e) => {
         console.log(e);
@@ -109,7 +108,6 @@ export class HomeComponent implements OnInit {
           this.taskService.deleteTask(this.empId, taskId).subscribe({
             next: (res) => {
               this.employee = res.data;
-              // this.employee = res;
             },
             error: (e) => {
               console.log(e);
@@ -152,11 +150,7 @@ export class HomeComponent implements OnInit {
   updateTaskList(empId: number, todo: Item[], done: Item[]): void {
     this.taskService.updateTask(empId, todo, done).subscribe({
       next: (res) => {
-        console.log('update task');
-        console.log('---');
-        console.log('res: ', res);
         this.employee = res.data;
-        // this.employee = res;
       },
       error: (e) => {
         console.log(e);
@@ -167,17 +161,5 @@ export class HomeComponent implements OnInit {
         this.done = this.employee.done;
       },
     });
-  }
-
-  // Easier target for Form control (https://angular.io/api/forms/AbstractControl#haserror)
-  get taskControl() {
-    return this.taskForm.controls['task'];
-  }
-
-  formControlChange(event: any): void {
-    console.log(event);
-    console.log('---');
-    console.log(this.taskForm.controls['task']);
-    // console.log(`errors: ${this.taskForm.controls['task']?.errors}`);
   }
 }

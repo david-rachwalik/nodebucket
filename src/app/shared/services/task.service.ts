@@ -2,7 +2,7 @@
 ============================================
 ; Title:        task.service.ts
 ; Author:       David Rachwalik
-; Date:         2022/08/22
+; Date:         2022/09/02
 ; Description:  Service for employee tasks
 ;===========================================
 */
@@ -20,24 +20,19 @@ import { Item } from '../models/item.interface';
 export class TaskService {
   constructor(private http: HttpClient) {}
 
-  // findAllTasks(empId: number): Observable<Employee> {
-  //   return this.http.get<Employee>(`/api/employees/${empId}/tasks`);
-  // }
-
-  // createTask(empId: number, task: string): Observable<Employee> {
-  //   return this.http.post<Employee>(`/api/employees/${empId}/tasks`, {
-  //     text: task,
-  //   });
-  // }
-
-  findAllTasks(empId: number): Observable<Employee> {
-    return this.http.get<Employee>(`/api/employees/${empId}/tasks`);
+  findAllTasks(empId: number): Observable<BaseResponse<Employee>> {
+    return this.http.get<BaseResponse<Employee>>(
+      `/api/employees/${empId}/tasks`,
+    );
   }
 
-  createTask(empId: number, task: string): Observable<Employee> {
-    return this.http.post<Employee>(`/api/employees/${empId}/tasks`, {
-      text: task,
-    });
+  createTask(empId: number, task: string): Observable<BaseResponse<Employee>> {
+    return this.http.post<BaseResponse<Employee>>(
+      `/api/employees/${empId}/tasks`,
+      {
+        text: task,
+      },
+    );
   }
 
   updateTask(
