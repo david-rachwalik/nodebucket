@@ -504,13 +504,11 @@ router.delete('/:empId/tasks/:taskId', async (req, res) => {
         const { taskId } = req.params;
         const todoItem = employee.todo.find((i) => String(i._id) === taskId);
         const doneItem = employee.done.find((i) => String(i._id) === taskId);
-
         if (todoItem || doneItem) {
+          // --- Update ToDo/Done items ---
           if (todoItem) {
-            // --- ToDo Items ---
             employee.todo.id(todoItem._id).remove();
           } else {
-            // --- Done Items ---
             employee.todo.id(doneItem._id).remove();
           }
           // Commit the changes to database
