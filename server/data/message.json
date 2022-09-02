@@ -10,5 +10,9 @@
   {
     "statusCode": "200",
     "message": "Query successful"
+  },
+  {
+    "statusCode": "400",
+    "message": "Bad Request"
   }
 ]
