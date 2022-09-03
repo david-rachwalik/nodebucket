@@ -53,6 +53,8 @@ const routes: Routes = [
       },
     ],
   },
+  // Wild card route for 404 requests
+  { path: '**', redirectTo: 'session/not-found' },
 ];
 
 @NgModule({
