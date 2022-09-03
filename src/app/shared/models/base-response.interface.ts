@@ -15,7 +15,7 @@
 // }
 
 export interface BaseResponse<T> {
-  httpCode: number;
+  httpCode: number | string;
   message: string;
   data: T;
   timestamp: string;
