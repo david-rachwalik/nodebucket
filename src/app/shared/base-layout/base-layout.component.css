@@ -1,20 +1,20 @@
-.logo {
+header mat-toolbar {
+  height: 6rem;
+  border-bottom: 0.5rem solid #d6a800;
+}
+
+header button[routerLink] {
+  font-size: 24px;
+  font-weight: lighter;
+}
+header button[routerLink]:first-of-type {
   margin-left: 75px;
-  font-size: 24px;
+}
+
+.profile-menu-label {
+  padding: 10px;
+  font-size: 16px;
   font-weight: lighter;
-}
-
-.navbar-container {
-  padding: 5px;
-}
-
-.navbar-link {
-  font-size: 24px;
-  font-weight: lighter;
-}
-
-.main-content {
-  padding-left: 30px;
 }
 
 footer {
@@ -23,17 +23,19 @@ footer {
   width: 100%;
 }
 
-.footer-content {
+footer mat-toolbar {
+  height: auto;
+  min-height: 3rem;
   font-size: 16px;
   font-weight: lighter;
   padding-left: 100px;
   letter-spacing: 3px;
+  text-align: right;
 }
 
-.bu-link {
+footer a {
   text-decoration: none;
 }
-
-.bu-link:hover {
+footer a:hover {
   text-decoration: underline;
 }

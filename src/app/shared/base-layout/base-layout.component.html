@@ -1,32 +1,26 @@
 <header>
   <!-- navigation -->
   <nav fxFlex>
-    <mat-toolbar style="border-bottom: 15px solid #D6A800; height: 100px;" color="primary">
-      <!-- navbar container -->
-      <div class="navbar-container">
-        <!-- logo -->
-        <button mat-button routerLink="/" class="logo">nodebucket</button>
-        <button mat-button routerLink="/about" class="navbar-link">About</button>
-        <button mat-button routerLink="/contact" class="navbar-link">Contact Us</button>
-      </div>
+    <mat-toolbar color="primary" class="mat-elevation-z1">
+      <button mat-button routerLink="/">nodebucket</button>
+      <button mat-button routerLink="/about">About</button>
+      <button mat-button routerLink="/contact">Contact Us</button>
 
       <div fxFlex></div>
 
-      <div>
-        <button mat-icon-button [matMenuTriggerFor]="profileMenu" aria-label="User profile menu">
-          <mat-icon>perm_identity</mat-icon>
+      <!-- start of Menu (https://material.angular.io/components/menu) -->
+      <button mat-icon-button [matMenuTriggerFor]="profileMenu" aria-label="User profile menu">
+        <mat-icon>perm_identity</mat-icon>
+      </button>
+
+      <mat-menu #profileMenu>
+        <p class="profile-menu-label">Logged in as {{ sessionName }}</p>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Log out</span>
         </button>
-
-        <!-- https://material.angular.io/components/menu -->
-        <mat-menu #profileMenu>
-          <p style="padding: 10px; font-size: 16px; font-weight: lighter;">Logged in as {{ sessionName }}</p>
-          <button mat-menu-item (click)="logout()">
-            <mat-icon>logout</mat-icon>
-            <span>Log out</span>
-          </button>
-        </mat-menu>
-      </div>
-
+      </mat-menu>
+      <!-- end of Menu -->
     </mat-toolbar>
   </nav>
 </header>
@@ -38,10 +32,11 @@
 
 <!-- footer -->
 <footer>
-  <mat-toolbar class="footer-content">
+  <mat-toolbar class="mat-elevation-z1">
     <div fxFlex></div>
-    <p>
-      &copy; {{year | date: 'yyyy'}} - nodebucket - <a href="https://www.bellevue.edu/" class="bu-link" target="_blank">Bellevue University</a>
-    </p>
+    <span>
+      &copy; {{year | date: 'yyyy'}} - nodebucket - <a href="https://www.bellevue.edu" target="_blank">Bellevue University</a>
+      <!-- &copy; 2022-{{year | date: 'yyyy'}} - nodebucket - <a href="https://www.bellevue.edu" target="_blank">Bellevue University</a> -->
+    </span>
   </mat-toolbar>
 </footer>
