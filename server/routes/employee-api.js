@@ -508,8 +508,8 @@ router.delete('/:empId/tasks/:taskId', async (req, res) => {
           // --- Update ToDo/Done items ---
           if (todoItem) {
             employee.todo.id(todoItem._id).remove();
-          } else {
-            employee.todo.id(doneItem._id).remove();
+          } else if (doneItem) {
+            employee.done.id(doneItem._id).remove();
           }
           // Commit the changes to database
           employee.save((error, updatedEmployee) => {
