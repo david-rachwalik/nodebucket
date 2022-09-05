@@ -1,8 +1,118 @@
-<div fxLayout="column" class="main-welcome">
-  <h1 class="title">
-    Welcome to WEB 450's - nodebucket Project <br />
-    <span class="subtitle">
-      Pay close attention to the requirements, double and triple check the files for code attribution, and do not wait until the last minute to begin working on your tasks.
-    </span>
-  </h1>
+<div fxLayout="row">
+  <div fxFlex.gt-sm="70%" fxFlex.gt-xs="90%" fxFlex style="margin: 0 auto;">
+    <div fxLayout="column" class="main-welcome">
+
+      <div fxFlex>
+        <h1 class="title">
+          Welcome to WEB 450's - nodebucket Project
+          <br />
+          <!-- <span class="subtitle">
+            Pay close attention to the requirements, double and triple check the files for code attribution, and do not wait until the last minute to begin
+            working
+            on your tasks.
+          </span> -->
+        </h1>
+      </div>
+
+
+      <div fxFlex>
+        <div class="task-container mat-elevation-z4" fxLayout="column">
+          <mat-card>
+            <form [formGroup]="taskForm" (ngSubmit)="createTask(); taskForm.reset()">
+              <mat-form-field appearance="fill" class="w-100">
+                <input matInput name="task" formControlName="task" placeholder="Enter a task name..." />
+
+                <button mat-icon-button type="submit" [disabled]="!taskForm.valid" matSuffix>
+                  <mat-icon color="primary" class="task-add" matSuffix>add_circle</mat-icon>
+                </button>
+              </mat-form-field>
+
+              <mat-error *ngIf="taskForm.controls['task'].hasError('required') && taskForm.controls['task'].touched">
+                Task is a required field.
+              </mat-error>
+
+              <mat-error *ngIf="taskForm.controls['task'].hasError('minlength') && taskForm.controls['task'].touched">
+                The task field must be at least 3 characters in length.
+              </mat-error>
+
+              <mat-error *ngIf="taskForm.controls['task'].hasError('maxlength') && taskForm.controls['task'].touched">
+                The task field cannot exceed 35 characters in length.
+              </mat-error>
+            </form>
+          </mat-card>
+        </div>
+      </div>
+      <br /><br />
+
+
+      <div fxFlex>
+        <div fxLayout="row" fxLayoutGap="15px" class="task-container">
+
+          <!-- first row -->
+          <div fxFlex>
+            <mat-card class="mat-elevation-z0">
+              <mat-card-title>ToDo</mat-card-title>
+
+              <mat-card-content>
+                <!-- todo -->
+                <div fxLayout="column" fxLayoutGap="10px" cdkDropList #todoList="cdkDropList" [cdkDropListData]="todo" [cdkDropListConnectedTo]="[doneList]"
+                  (cdkDropListDropped)="drop($event)" class="task-column mat-elevation-z3">
+
+                  <mat-card *ngFor="let item of todo" cdkDrag class="task-card mat-elevation-z1">
+                    <mat-card-content>
+                      <div fxLayout="row">
+                        <!-- todo task text -->
+                        <div fxFlex>{{ item.text }}</div>
+                        <!-- delete button -->
+                        <button mat-icon-button (click)="deleteTask(item._id)">
+                          <mat-icon color="warn">delete</mat-icon>
+                        </button>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+                  <!-- end of the for loop -->
+
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+          <!-- end of first row -->
+
+          <!-- second row -->
+          <div fxFlex>
+            <mat-card class="mat-elevation-z0">
+              <mat-card-title>Done</mat-card-title>
+
+              <mat-card-content>
+                <!-- done -->
+                <div fxLayout="column" fxLayoutGap="10px" cdkDropList #doneList="cdkDropList" [cdkDropListData]="done" [cdkDropListConnectedTo]="[todoList]"
+                  (cdkDropListDropped)="drop($event)" class="task-column mat-elevation-z3">
+
+                  <mat-card *ngFor="let item of done" cdkDrag class="task-card mat-elevation-z1">
+                    <mat-card-content>
+                      <div fxLayout="row">
+                        <!-- todo task text -->
+                        <div fxFlex>{{ item.text }}</div>
+                        <!-- delete button -->
+                        <button mat-icon-button (click)="deleteTask(item._id)">
+                          <mat-icon color="warn">delete</mat-icon>
+                        </button>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+                  <!-- end of the for loop -->
+
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+          <!-- end of second row -->
+
+        </div>
+      </div>
+      <br /><br />
+
+    </div>
+  </div>
 </div>
+<br /><br />

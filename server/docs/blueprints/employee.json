@@ -1,0 +1,14 @@
+{
+  "empId": "1016",
+  "firstName": "Default",
+  "lastName": "Tester",
+  "todo": [
+    {
+      "text": "Test task 01"
+    },
+    {
+      "text": "Test task 02"
+    }
+  ],
+  "done": []
+}

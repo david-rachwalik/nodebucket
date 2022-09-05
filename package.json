@@ -3,13 +3,14 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --open",
+    "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "server": "nodemon ./server/index.js",
     "localhost": "ng build && node ./server/index.js",
-    "both": "concurrently \"npm:server\" \"npm:start\""
+    "client": "ng serve --open",
+    "server": "nodemon ./server/index.js",
+    "both": "concurrently \"npm:server\" \"npm:client\""
   },
   "private": true,
   "dependencies": {

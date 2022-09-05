@@ -2,13 +2,14 @@
 ============================================
 ; Title:        employee-api.js
 ; Author:       David Rachwalik
-; Date:         2022/08/19
+; Date:         2022/09/02
 ; Description:  API route for Employee documents
 ;===========================================
 */
 
 const express = require('express');
 const Employee = require('../models/employee');
+const logResponse = require('../data/baseResponse');
 
 const router = express.Router();
 
@@ -37,21 +38,25 @@ router.get('', async (req, res) => {
   try {
     Employee.find({}, (err, employees) => {
       if (err) {
-        console.log(err);
-        res.status(501).send({
-          message: `MongoDB Exception: ${err.message}`,
-        });
+        // console.log(err);
+        // res.status(501).send({
+        //   message: `MongoDB Exception: ${err.message}`,
+        // });
+        const response = logResponse(501, err);
+        res.status(501).send(response);
       } else {
         // Successfully found documents
-        console.log(employees);
-        res.json(employees);
+        const response = logResponse(200, employees);
+        res.json(response);
       }
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).send({
-      message: `Server Exception: ${err.message}`,
-    });
+    // console.log(err);
+    // res.status(500).send({
+    //   message: `Server Exception: ${err.message}`,
+    // });
+    const response = logResponse(500, err);
+    res.status(500).send(response);
   }
 });
 
@@ -83,21 +88,17 @@ router.get('/:empId', async (req, res) => {
   try {
     Employee.findOne({ empId: req.params.empId }, (err, employee) => {
       if (err) {
-        console.log(err);
-        res.status(501).send({
-          message: `MongoDB Exception: ${err.message}`,
-        });
+        const response = logResponse(501, err);
+        res.status(501).send(response);
       } else {
         // Successfully found document
-        console.log(employee);
-        res.json(employee);
+        const response = logResponse(200, employee);
+        res.json(response);
       }
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).send({
-      message: `Server Exception: ${err.message}`,
-    });
+    const response = logResponse(500, err);
+    res.status(500).send(response);
   }
 });
 
@@ -139,24 +140,20 @@ router.post('', async (req, res) => {
       firstName: req.body.firstName,
       lastName: req.body.lastName,
     };
-
+    // Attempt to create new Employee document
     Employee.create(newEmployee, (err, employee) => {
       if (err) {
-        console.log(err);
-        res.status(501).send({
-          message: `MongoDB Exception: ${err.message}`,
-        });
+        const response = logResponse(501, err);
+        res.status(501).send(response);
       } else {
         // Successfully created document
-        console.log(employee);
-        res.json(employee);
+        const response = logResponse(200, employee);
+        res.json(response);
       }
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).send({
-      message: `Server Exception: ${err.message}`,
-    });
+    const response = logResponse(500, err);
+    res.status(500).send(response);
   }
 });
 
@@ -193,8 +190,8 @@ router.post('', async (req, res) => {
  *     responses:
  *       '200':
  *         description: Employee document.
- *       '401':
- *         description: Invalid 'employeeId' provided.
+ *       '400':
+ *         description: Invalid parameter provided.
  *       '500':
  *         description: Server Exception.
  *       '501':
@@ -204,43 +201,36 @@ router.put('/:empId', async (req, res) => {
   try {
     Employee.findOne({ empId: req.params.empId }, (err, employee) => {
       if (err) {
-        console.log(err);
-        res.status(501).send({
-          message: `MongoDB Exception: ${err.message}`,
+        const response = logResponse(501, err);
+        res.status(501).send(response);
+      } else if (employee) {
+        // Successfully found document by id
+        console.log(employee);
+        // Assign new values to document
+        employee.set({
+          empId: req.body.empId,
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
+        });
+        // Commit the changes to database
+        employee.save((error, updatedEmployee) => {
+          if (error) {
+            const response = logResponse(501, error);
+            res.status(501).send(response);
+          } else {
+            // Successfully updated document
+            const response = logResponse(200, updatedEmployee);
+            res.json(response);
+          }
         });
       } else {
-        console.log(employee);
-        if (employee) {
-          // Assign new values to document
-          employee.set({
-            empId: req.body.empId,
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-          });
-          // Commit the changes to database
-          employee.save((error, updatedEmployee) => {
-            if (error) {
-              console.log(error);
-              res.json(updatedEmployee);
-            } else {
-              // Successfully updated document
-              console.log(updatedEmployee);
-              res.json(updatedEmployee);
-            }
-          });
-        } else {
-          console.log('Invalid employeeId');
-          res.status(401).send({
-            message: `Invalid employeeId`,
-          });
-        }
+        const response = logResponse(400, { empId: req.params.empId });
+        res.status(400).send(response);
       }
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).send({
-      message: `Server Exception: ${err.message}`,
-    });
+    const response = logResponse(500, err);
+    res.status(500).send(response);
   }
 });
 
@@ -272,21 +262,17 @@ router.delete('/:empId', async (req, res) => {
   try {
     Employee.findByIdAndDelete({ empId: req.params.empId }, (err, employee) => {
       if (err) {
-        console.log(err);
-        res.status(501).send({
-          message: `MongoDB Exception: ${err.message}`,
-        });
+        const response = logResponse(501, err);
+        res.status(501).send(response);
       } else {
         // Successfully deleted document
-        console.log(employee);
-        res.json(employee);
+        const response = logResponse(200, employee);
+        res.json(response);
       }
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).send({
-      message: `Server Exception: ${err.message}`,
-    });
+    const response = logResponse(500, err);
+    res.status(500).send(response);
   }
 });
 
@@ -323,21 +309,17 @@ router.get('/:empId/tasks', async (req, res) => {
       'empId todo done',
       (err, employee) => {
         if (err) {
-          console.log(err);
-          res.status(501).send({
-            err: `MongoDB server error: ${err.message}`,
-          });
+          const response = logResponse(501, err);
+          res.status(501).send(response);
         } else {
-          console.log(employee);
-          res.json(employee);
+          const response = logResponse(200, employee);
+          res.json(response);
         }
       },
     );
-  } catch (e) {
-    console.log(e);
-    res.status(500).send({
-      err: `Internal server error: ${e.message}`,
-    });
+  } catch (err) {
+    const response = logResponse(500, err);
+    res.status(500).send(response);
   }
 });
 
@@ -360,6 +342,8 @@ router.get('/:empId/tasks', async (req, res) => {
  *     responses:
  *       '200':
  *         description: Employee task documents.
+ *       '400':
+ *         description: Invalid parameter provided.
  *       '500':
  *         description: Server Exception.
  *       '501':
@@ -369,11 +353,9 @@ router.post('/:empId/tasks', async (req, res) => {
   try {
     Employee.findOne({ empId: req.params.empId }, (err, employee) => {
       if (err) {
-        console.log(err);
-        res.status(501).send({
-          err: `MongoDB server error: ${err.message}`,
-        });
-      } else {
+        const response = logResponse(501, err);
+        res.status(501).send(response);
+      } else if (employee) {
         // Successfully found Employee document
         console.log(employee);
         // Generate new task and add to ToDos
@@ -383,23 +365,175 @@ router.post('/:empId/tasks', async (req, res) => {
         employee.todo.push(newTask);
         employee.save((error, updatedEmp) => {
           if (error) {
-            console.log(error);
-            res.status(501).send({
-              err: `MongoDB server error: ${error.message}`,
-            });
+            const response = logResponse(501, error);
+            res.status(501).send(response);
           } else {
             // Successfully created document
-            console.log(updatedEmp);
-            res.json(updatedEmp);
+            const response = logResponse(200, updatedEmp);
+            res.json(response);
           }
         });
+      } else {
+        const response = logResponse(400, { empId: req.params.empId });
+        res.status(400).send(response);
       }
     });
-  } catch (e) {
-    console.log(e);
-    res.status(500).send({
-      err: `Internal server error: ${e.message}`,
+  } catch (err) {
+    const response = logResponse(500, err);
+    res.status(500).send(response);
+  }
+});
+
+/**
+ * updateTasks
+ * @openapi
+ * /api/employees/{empId}/tasks:
+ *   put:
+ *     tags:
+ *       - Employees
+ *     summary: update all Employee task documents
+ *     description: API for batch updating all Employee task documents.
+ *     parameters:
+ *       - name: empId
+ *         in: path
+ *         required: true
+ *         description: Employee document id
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       description: Employee information
+ *       content:
+ *         application/json:
+ *           schema:
+ *             required:
+ *               - todo
+ *               - done
+ *             properties:
+ *               todo:
+ *                 type: array
+ *               done:
+ *                 type: array
+ *     responses:
+ *       '200':
+ *         description: Employee task document.
+ *       '400':
+ *         description: Invalid parameter provided.
+ *       '500':
+ *         description: Server Exception.
+ *       '501':
+ *         description: MongoDB Exception.
+ */
+router.put('/:empId/tasks', async (req, res) => {
+  try {
+    Employee.findOne({ empId: req.params.empId }, (err, employee) => {
+      if (err) {
+        const response = logResponse(501, err);
+        res.status(501).send(response);
+      } else if (employee) {
+        // Successfully found document by id
+        console.log(employee);
+        // Assign new values to document
+        employee.set({
+          todo: req.body.todo,
+          done: req.body.done,
+        });
+        // Commit the changes to database
+        employee.save((error, updatedEmployee) => {
+          if (error) {
+            const response = logResponse(501, error);
+            res.status(501).send(response);
+          } else {
+            // Successfully updated document
+            const response = logResponse(200, updatedEmployee);
+            res.json(response);
+          }
+        });
+      } else {
+        const response = logResponse(400, { empId: req.params.empId });
+        res.status(400).send(response);
+      }
     });
+  } catch (err) {
+    const response = logResponse(500, err);
+    res.status(500).send(response);
+  }
+});
+
+/**
+ * deleteTask
+ * @openapi
+ * /api/employees/{empId}/tasks/{taskId}:
+ *   delete:
+ *     tags:
+ *       - Employees
+ *     summary: remove an Employee task document
+ *     description: API for deleting an Employee task document.
+ *     parameters:
+ *       - name: empId
+ *         in: path
+ *         required: true
+ *         description: Employee document id
+ *         schema:
+ *           type: string
+ *       - name: taskId
+ *         in: path
+ *         required: true
+ *         description: Employee task document id
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Employee document.
+ *       '400':
+ *         description: Invalid parameter provided.
+ *       '500':
+ *         description: Server Exception.
+ *       '501':
+ *         description: MongoDB Exception.
+ */
+router.delete('/:empId/tasks/:taskId', async (req, res) => {
+  try {
+    Employee.findOne({ empId: req.params.empId }, (err, employee) => {
+      if (err) {
+        const response = logResponse(501, err);
+        res.status(501).send(response);
+      } else if (employee) {
+        // Successfully found document by id
+        console.log(employee);
+        // Assign new values to document
+        const { taskId } = req.params;
+        const todoItem = employee.todo.find((i) => String(i._id) === taskId);
+        const doneItem = employee.done.find((i) => String(i._id) === taskId);
+        if (todoItem || doneItem) {
+          // --- Update ToDo/Done items ---
+          if (todoItem) {
+            employee.todo.id(todoItem._id).remove();
+          } else if (doneItem) {
+            employee.done.id(doneItem._id).remove();
+          }
+          // Commit the changes to database
+          employee.save((error, updatedEmployee) => {
+            if (error) {
+              const response = logResponse(501, error);
+              res.status(501).send(response);
+            } else {
+              // Successfully updated document
+              const response = logResponse(200, updatedEmployee);
+              res.json(response);
+            }
+          });
+        } else {
+          const response = logResponse(400, { taskId });
+          res.status(400).send(response);
+        }
+      } else {
+        const response = logResponse(400, { empId: req.params.empId });
+        res.status(400).send(response);
+      }
+    });
+  } catch (err) {
+    const response = logResponse(500, err);
+    res.status(500).send(response);
   }
 });
 

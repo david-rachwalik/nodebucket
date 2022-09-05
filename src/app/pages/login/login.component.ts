@@ -55,14 +55,14 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {}
 
   login() {
-    const empId = this.loginForm.controls['empId'].value;
+    const empId: number = this.loginForm.controls['empId'].value;
     console.log('empId: ', empId);
 
     this.sessionService.findEmployeeById(empId).subscribe({
       next: (res) => {
         if (res) {
           // Store successful response to employee
-          this.employee = res;
+          this.employee = res.data;
 
           this.router.navigate(['/']);
 

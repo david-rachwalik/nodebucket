@@ -1,0 +1,43 @@
+.main-welcome {
+  margin-top: 30px;
+}
+
+.title {
+  text-align: center;
+  font-weight: lighter;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 14px;
+}
+
+/* --- Task Styling --- */
+
+.task-container {
+  margin-top: 10px;
+}
+
+.task-add {
+  /* width: 36px;
+  height: 36px;
+  font-size: 36px; */
+  width: 24px;
+  height: 24px;
+  font-size: 24px;
+  line-height: 24px;
+}
+
+.task-card .mat-button-base {
+  width: 24px;
+  height: 24px;
+  font-size: 24px;
+  line-height: 24px;
+  margin-top: -5px;
+}
+
+.task-column {
+  /* border: 1px solid orange; */
+  min-height: 65px;
+  padding: 10px;
+}

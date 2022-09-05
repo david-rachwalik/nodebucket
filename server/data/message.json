@@ -1,0 +1,18 @@
+[
+  {
+    "statusCode": "500",
+    "message": "Internal Server Error"
+  },
+  {
+    "statusCode": "501",
+    "message": "MongoDB Server Error"
+  },
+  {
+    "statusCode": "200",
+    "message": "Query successful"
+  },
+  {
+    "statusCode": "400",
+    "message": "Bad Request"
+  }
+]
