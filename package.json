@@ -3,14 +3,16 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start-bak": "ng serve",
+    "start": "node ./server/index.js",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "localhost": "ng build && node ./server/index.js",
     "client": "ng serve --open",
     "server": "nodemon ./server/index.js",
-    "both": "concurrently \"npm:server\" \"npm:client\""
+    "both": "concurrently \"npm:server\" \"npm:client\"",
+    "heroku-postinstall": "ng build"
   },
   "private": true,
   "dependencies": {
