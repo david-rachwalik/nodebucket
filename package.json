@@ -1,18 +1,23 @@
 {
   "name": "nodebucket",
   "version": "0.0.0",
+  "private": true,
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start-bak": "ng serve",
+    "start": "node ./server/index.js",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "localhost": "ng build && node ./server/index.js",
-    "client": "ng serve --open",
     "server": "nodemon ./server/index.js",
-    "both": "concurrently \"npm:server\" \"npm:client\""
+    "client": "ng serve --open",
+    "both": "concurrently \"npm:server\" \"npm:client\"",
+    "deploy": "git push heroku dev:main"
   },
-  "private": true,
+  "engines": {
+    "node": "16.14.2"
+  },
   "dependencies": {
     "@angular/animations": "^14.0.0",
     "@angular/cdk": "^14.1.1",
