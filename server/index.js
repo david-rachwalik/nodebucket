@@ -78,7 +78,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification));
 app.use('/api/employees', EmployeeAPI);
 
 // --- Start the Express server ---
-const PORT = 3000 || process.env.PORT; // Default server port value
+const PORT = process.env.PORT || 3000; // Default server port value
 app.listen(PORT, () => {
   console.log(`Application started and listening on PORT: ${PORT}`);
 });
