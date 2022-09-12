@@ -10,10 +10,10 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "localhost": "ng build && node ./server/index.js",
-    "client": "ng serve --open",
     "server": "nodemon ./server/index.js",
+    "client": "ng serve --open",
     "both": "concurrently \"npm:server\" \"npm:client\"",
-    "heroku-postinstall": "ng build"
+    "deploy": "git push heroku dev:main"
   },
   "engines": {
     "node": "16.14.2"
