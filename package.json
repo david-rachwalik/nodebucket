@@ -1,6 +1,7 @@
 {
   "name": "nodebucket",
   "version": "0.0.0",
+  "private": true,
   "scripts": {
     "ng": "ng",
     "start-bak": "ng serve",
@@ -14,7 +15,9 @@
     "both": "concurrently \"npm:server\" \"npm:client\"",
     "heroku-postinstall": "ng build"
   },
-  "private": true,
+  "engines": {
+    "node": "16.14.2"
+  },
   "dependencies": {
     "@angular/animations": "^14.0.0",
     "@angular/cdk": "^14.1.1",
