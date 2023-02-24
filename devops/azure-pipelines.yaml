@@ -1,0 +1,45 @@
+# Azure Pipeline to deploy a MEAN stack web application
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+# https://github.com/Microsoft/azure-pipelines-yaml/blob/master/templates/asp.net-core.yml
+
+# linuxFxVersion: for "Microsoft.Web/sites" is used to specify the runtime stack or container for a web app running on Linux in Azure App Service
+# - Node.js: NODE|<version>, Node.js you want to use, such as NODE|10.14 or NODE|12.16
+# - Python: PYTHON|<version>, Python you want to use, such as PYTHON|3.7.1 or PYTHON|3.8.0
+# - PHP: PHP|<version>, PHP you want to use, such as PHP|7.2
+# - .NET Core: DOTNETCORE|<version>, .NET Core you want to use, such as DOTNETCORE|3.1
+# - Custom container: DOCKER|<image-name>:<tag>, where <image-name> is the name of the Docker image you want to use, and <tag> is the tag or version of the image, such as DOCKER|myimage:1.0
+
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      # - 'src/**'
+      # - 'azuredeploy.json'
+      - 'devops/**'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  subscriptionName: 'Pay-As-You-Go'
+  resourceGroupName: 'rg-nodebucket'
+  location: 'southcentralus' # 'eastus'
+  # nodejsVersion: '14.x'
+  # appServicePlanName: 'asp-nodebucket'
+  # appName: 'webapp-nodebucket'
+  # mongoDbVersion: 'latest'
+
+steps:
+  - task: AzureResourceGroupDeployment@2
+    displayName: 'Deploy ARM template'
+    inputs:
+      azureSubscription: '$(subscriptionName)'
+      resourceGroupName: '$(resourceGroupName)'
+      location: '$(location)'
+      # csmFile: '<path-to-arm-template-file>'
+      # csmParametersFile: '<path-to-arm-template-parameters-file>'
+      # overrideParameters: '-webAppName <web-app-name> -linuxFxVersion "NODE|14-lts" -repositoryUrl <repository-url> -branch <repository-branch> -isManualIntegration false'
+      csmFile: '$(Build.ArtifactStagingDirectory)/devops/azuredeploy.json'
+      csmParametersFile: '$(Build.ArtifactStagingDirectory)/devops/azuredeploy.parameters.json'

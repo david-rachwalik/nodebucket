@@ -1,0 +1,73 @@
+# Azure Pipeline to deploy a MEAN stack web application
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+# https://github.com/Microsoft/azure-pipelines-yaml/blob/master/templates/asp.net-core.yml
+
+trigger:
+  - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  location: 'eastus'
+  resourceGroupName: 'rg-nodebucket'
+  nodejsVersion: '14.x'
+  appServicePlanName: 'asp-nodebucket'
+  appName: 'webapp-nodebucket'
+  # mongoDbVersion: 'latest'
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '$(nodejsVersion)'
+    displayName: 'Install Node.js'
+
+  - script: |
+      npm install
+      npm run build
+    displayName: 'Install dependencies and build'
+
+  - task: AzureWebApp@1
+    inputs:
+      appType: 'webAppLinux'
+      appName: '$(appName)'
+      package: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+      runtimeStack: 'NODE|$(nodejsVersion)'
+      startupCommand: 'npm start'
+      deployToSlotOrASE: true
+      resourceGroupName: '$(resourceGroupName)'
+      slotName: 'production'
+      regionName: '$(location)'
+      createOrUpdateAppServicePlan: true
+      appServicePlanName: '$(appServicePlanName)'
+      skuName: 'F1'
+      # mongodbConnectionStrings: 'mongodb://localhost:27017/your-database-name'
+      # mongodbDatabaseName: 'your-database-name'
+      # mongodbVersion: '$(mongoDbVersion)'
+      azureSubscription: 'your-azure-subscription-name'
+    displayName: 'Deploy to Azure App Service'
+
+  - task: AzureAppServiceManage@0
+    inputs:
+      ConnectedServiceName: 'your-service-connection-name'
+      azureSubscription: 'your-azure-subscription-name'
+      ResourceGroupName: '$(resourceGroupName)'
+      action: 'Stop'
+      AppName: '$(appName)'
+      SlotName: 'staging'
+      DoNotDelete: true
+    condition: succeededOrFailed()
+    displayName: 'Stop staging slot'
+
+  - task: AzureAppServiceManage@0
+    inputs:
+      ConnectedServiceName: 'your-service-connection-name'
+      azureSubscription: 'your-azure-subscription-name'
+      ResourceGroupName: '$(resourceGroupName)'
+      action: 'Swap Slots'
+      SourceSlot: 'production'
+      DestinationSlot: 'staging'
+      AppName: '$(appName)'
+      DoNotDelete: true
+    condition: succeeded()
+    displayName: 'Swap production and staging slots'

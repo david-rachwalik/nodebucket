@@ -1,0 +1,104 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appName": {
+      "type": "string",
+      "defaultValue": "[uniqueString(resourceGroup().id)]",
+      "minLength": 2,
+      "metadata": {
+        "description": "Application name."
+      }
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "F1",
+      "metadata": {
+        "description": "The SKU of App Service Plan."
+      }
+    },
+    "linuxFxVersion": {
+      "type": "string",
+      "defaultValue": "NODE|lts",
+      "metadata": {
+        "description": "The Runtime stack of current web app"
+      }
+    },
+    "repoUrl": {
+      "type": "string",
+      "defaultValue": " ",
+      "metadata": {
+        "description": "Optional Git Repo URL"
+      }
+    },
+    "repoBranch": {
+      "type": "string",
+      "defaultValue": "master",
+      "metadata": {
+        "description": "Optional Git Repo branch"
+      }
+    }
+  },
+  "functions": [],
+  "variables": {
+    "location": "[resourceGroup().location]",
+    "webAppName": "[format('webapp-{0}', parameters('appName'))]",
+    "appServicePlanName": "[format('asp-{0}', parameters('appName'))]"
+  },
+  "resources": [
+    {
+      // https://learn.microsoft.com/en-us/azure/templates/microsoft.web/serverfarms
+      // https://github.com/Azure/azure-quickstart-templates/blob/master/quickstarts/microsoft.web/app-service-docs-linux/azuredeploy.json
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2022-03-01",
+      "name": "[variables('appServicePlanName')]",
+      "location": "[variables('location')]",
+      "sku": {
+        "name": "[parameters('sku')]"
+      },
+      "kind": "linux",
+      "properties": {
+        "reserved": true
+      }
+    },
+    {
+      // https://learn.microsoft.com/en-us/azure/templates/microsoft.web/sites
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2022-03-01",
+      "name": "[variables('webAppName')]",
+      "location": "[variables('location')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+      ],
+      "properties": {
+        "httpsOnly": true,
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+        "siteConfig": {
+          "linuxFxVersion": "[parameters('linuxFxVersion')]",
+          "minTlsVersion": "1.2",
+          "ftpsState": "FtpsOnly"
+        }
+      }
+    },
+    {
+      // https://learn.microsoft.com/en-us/azure/templates/microsoft.web/sites/sourcecontrols
+      "condition": "[contains(parameters('repoUrl'), 'http')]",
+      "type": "Microsoft.Web/sites/sourcecontrols",
+      "apiVersion": "2022-03-01",
+      "name": "[format('{0}/{1}', variables('webAppName'), 'web')]",
+      "properties": {
+        "repoUrl": "[parameters('repoUrl')]",
+        "branch": "[parameters('repoBranch')]",
+        // "kind": "github", // auto-detected by 'repoUrl', only used for override
+        "isManualIntegration": false // let Azure App Service handle the slot swap
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('webAppName'))]"
+      ]
+    }
+  ],
+  "outputs": {}
+}
