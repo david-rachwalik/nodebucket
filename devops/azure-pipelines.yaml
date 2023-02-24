@@ -32,6 +32,13 @@ variables:
   # mongoDbVersion: 'latest'
 
 steps:
+  - task: ShellScript@2
+    displayName: 'Print working directory'
+    inputs:
+      script: |
+        #!/bin/bash
+        pwd
+
   - task: AzureResourceGroupDeployment@2
     displayName: 'Deploy ARM template'
     inputs:
@@ -41,5 +48,7 @@ steps:
       # csmFile: '<path-to-arm-template-file>'
       # csmParametersFile: '<path-to-arm-template-parameters-file>'
       # overrideParameters: '-webAppName <web-app-name> -linuxFxVersion "NODE|14-lts" -repositoryUrl <repository-url> -branch <repository-branch> -isManualIntegration false'
-      csmFile: '$(Build.ArtifactStagingDirectory)/devops/azuredeploy.json'
-      csmParametersFile: '$(Build.ArtifactStagingDirectory)/devops/azuredeploy.parameters.json'
+      # csmFile: '$(Build.ArtifactStagingDirectory)/devops/azuredeploy.json'
+      # csmParametersFile: '$(Build.ArtifactStagingDirectory)/devops/azuredeploy.parameters.json'
+      csmFile: '$(System.DefaultWorkingDirectory)/devops/azuredeploy.json'
+      csmParametersFile: '$(System.DefaultWorkingDirectory)/devops/azuredeploy.parameters.json'
