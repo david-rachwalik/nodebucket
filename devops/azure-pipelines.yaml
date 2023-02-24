@@ -32,12 +32,20 @@ variables:
   # mongoDbVersion: 'latest'
 
 steps:
-  - task: ShellScript@2
+  - task: CmdLine@2
     displayName: 'Print working directory'
     inputs:
       script: |
-        #!/bin/bash
+        echo Write your commands here
         pwd
+        echo Hello world
+
+  # - task: ShellScript@2
+  #   displayName: 'Print working directory'
+  #   inputs:
+  #     script: |
+  #       #!/bin/bash
+  #       pwd
 
   - task: AzureResourceGroupDeployment@2
     displayName: 'Deploy ARM template'
