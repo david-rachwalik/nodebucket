@@ -85,7 +85,16 @@
     },
     {
       // https://learn.microsoft.com/en-us/azure/templates/microsoft.web/sites/sourcecontrols
-      "condition": "[contains(parameters('repoUrl'), 'http')]",
+      // "condition": "[contains(parameters('repoUrl'), 'http')]",
+      // Plans that support deployment slots: Standard and above - Basic and Free plans do not
+      "condition": "[and(
+        contains(parameters('repoUrl'), 'http'),
+        or(
+          equals(parameters('sku'), 'S1'),
+          equals(parameters('sku'), 'S2'),
+          equals(parameters('sku'), 'S3')
+        )
+      )]",
       "type": "Microsoft.Web/sites/sourcecontrols",
       "apiVersion": "2022-03-01",
       "name": "[format('{0}/{1}', variables('webAppName'), 'web')]",
