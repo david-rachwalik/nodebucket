@@ -39,6 +39,7 @@ steps:
         echo Write your commands here
         pwd
         echo Hello world
+    # pwd -> /home/vsts/work/1/s
 
   # - task: ShellScript@2
   #   displayName: 'Print working directory'
