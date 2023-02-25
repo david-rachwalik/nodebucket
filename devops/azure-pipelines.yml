@@ -13,6 +13,7 @@ variables:
   subscriptionName: 'Pay-As-You-Go' # Pipeline connection (ARM)
   appServiceName: 'webapp-nodebucket' # web app name
   environmentName: 'Production'
+  artifactName: 'drop'
 
 stages:
   - stage: Build
@@ -108,10 +109,10 @@ stages:
           # Provide files to next stage
           # https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/publish-build-artifacts
           - task: PublishBuildArtifacts@1
-            displayName: 'Publish build artifact: drop'
+            displayName: 'Publish build artifact: $(artifactName)'
             inputs:
               pathtoPublish: '$(Build.ArtifactStagingDirectory)'
-              artifactName: 'drop'
+              artifactName: '$(artifactName)'
 
           - task: CmdLine@2
             displayName: 'List contents of staging directory'
@@ -133,6 +134,20 @@ stages:
           runOnce:
             deploy:
               steps:
+                # # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/download-build-artifacts-v0
+                # - download: current
+                #   artifact: drop
+                #   displayName: 'Download artifact'
+
+                # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/download-build-artifacts-v1
+                - task: DownloadBuildArtifacts@1
+                  inputs:
+                    buildType: 'current'
+                    downloadType: 'single'
+                    artifactName: '$(artifactName)'
+                    downloadPath: '$(System.ArtifactsDirectory)'
+
+                # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/cmd-line-v2
                 - task: CmdLine@2
                   displayName: 'Print working directory'
                   inputs:
@@ -140,22 +155,27 @@ stages:
                       echo Write your commands here
                       pwd
                       echo Hello world
-                      echo $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
+                      echo --- $(Pipeline.Workspace) ---
+                      ls $(Pipeline.Workspace)
+                      echo --- $(Pipeline.Workspace)/$(artifactName) ---
+                      ls $(Pipeline.Workspace)/$(artifactName)
                   # pwd -> /home/vsts/work/1/s
+                  # $(Pipeline.Workspace) -> /home/vsts/work/1
 
-                # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/azure-web-app-v1
-                - task: AzureWebApp@1
-                  displayName: 'Azure Web App Deploy: '
-                  inputs:
-                    azureSubscription: $(subscriptionName)
-                    appType: 'webAppLinux' # webApp|webAppLinux
-                    appName: $(appServiceName)
-                    package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
-                    runtimeStack: '$(runtimeStack)'
-                    startUpCommand: 'npm start'
-                    deploymentMethod: 'auto'
-                    # ensure fully loaded and ready to serve requests before deployment is complete
-                    # additionalDeploymentOptions: '--warmup-path /'
+                # # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/azure-web-app-v1
+                # - task: AzureWebApp@1
+                #   displayName: 'Deploy web app'
+                #   inputs:
+                #     azureSubscription: '$(subscriptionName)'
+                #     appType: 'webAppLinux' # webApp|webAppLinux
+                #     appName: '$(appServiceName)'
+                #     # package: '$(Pipeline.Workspace)/$(artifactName)/$(Build.BuildId).zip'
+                #     package: '$(Build.ArtifactStagingDirectory)/$(artifactName)/$(Build.BuildId).zip'
+                #     runtimeStack: '$(runtimeStack)'
+                #     startUpCommand: 'npm start'
+                #     deploymentMethod: 'auto'
+                #     # ensure fully loaded and ready to serve requests before deployment is complete
+                #     # additionalDeploymentOptions: '--warmup-path /'
 
   # F1 (free) tier doesn't support deployment slots, cannot use deployment swaps with zero downtime
   # can provide '--warmup-path' to AzureWebApp@1 task to reduce downtime
