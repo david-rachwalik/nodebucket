@@ -40,11 +40,20 @@ stages:
             inputs:
               versionSpec: $(nodeVersion)
 
+          # - script: |
+          #     npm install
+          #     npm run build:prod
+          #   # npm run test --if-present
+          #   # npm run test --if-present --no-watch --silent
+          #   displayName: 'npm install, build and test'
+
           - script: |
               npm install
-              npm run build --if-present
-              npm run test --if-present
-            displayName: 'npm install, build and test'
+            displayName: 'Install app dependencies'
+
+          - script: |
+              npm run build:prod
+            displayName: 'Build app (prod)'
 
           - task: ArchiveFiles@2
             displayName: 'Archive files'

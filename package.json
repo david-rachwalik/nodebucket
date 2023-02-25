@@ -7,6 +7,7 @@
     "start-bak": "ng serve",
     "start": "node ./server/index.js",
     "build": "ng build",
+    "build:prod": "ng build --prod",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "localhost": "ng build && node ./server/index.js",
@@ -16,7 +17,7 @@
     "deploy": "git push heroku dev:main"
   },
   "engines": {
-    "node": "16.14.2"
+    "node": "^16"
   },
   "dependencies": {
     "@angular/animations": "^14.0.0",
