@@ -14,7 +14,7 @@ variables:
   appServiceName: '' # web app name
   # webApp (default), api, functionApp, dockerContainer, aspnetcore
   # webAppLinux, node, aspnetcore, python, java, ruby, tomcat
-  appServiceType: 'node' # webAppLinux for general Linux web app
+  # appServiceType: 'node' # webAppLinux for general Linux web app
   # environmentName: ''
 
 stages:
@@ -68,7 +68,8 @@ stages:
                   inputs:
                     azureSubscription: $(subscriptionName)
                     appName: $(appServiceName)
-                    appType: $(appServiceType)
+                    # appType: '$(appServiceType)'
+                    appType: 'webAppLinux' # webApp|webAppLinux
                     runtimeStack: '$(runtimeStack)'
                     package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
                     startUpCommand: 'npm start'
