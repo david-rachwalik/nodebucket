@@ -24,40 +24,29 @@ stages:
         pool:
           vmImage: $(vmImageName)
         steps:
-          - task: CmdLine@2
-            displayName: 'Print working directory'
-            inputs:
-              script: |
-                echo Write your commands here
-                pwd
-                echo Hello world
+          # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/cmd-line-v2
+          - script: |
+              echo Hello world
+              pwd
             # pwd -> /home/vsts/work/1/s
+            displayName: 'Print working directory'
 
           - task: NodeTool@0
             displayName: 'Install Node.js'
             inputs:
               versionSpec: $(nodeVersion)
 
-          # - script: |
-          #     npm install
-          #     npm run build:prod
-          #   # npm run test --if-present
-          #   # npm run test --if-present --no-watch --silent
-          #   displayName: 'npm install, build and test'
-
-          - script: |
-              npm install
+          - script: npm install
             displayName: 'Install app dependencies'
 
-          - script: |
-              npm run build
+          - script: npm run build
             displayName: 'Build app (prod)'
 
-          - task: CmdLine@2
+          # - script: npm run test --if-present
+          #   displayName: 'Test app'
+
+          - script: ls
             displayName: 'List contents of working directory'
-            inputs:
-              script: |
-                ls
 
           # # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/archive-files-v2
           # - task: ArchiveFiles@2
@@ -92,14 +81,14 @@ stages:
                 server/**
                 dist/**
                 *
-              targetFolder: '$(Build.ArtifactStagingDirectory)'
+              targetFolder: $(Build.ArtifactStagingDirectory)
 
           # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/archive-files-v2
           - task: ArchiveFiles@2
             displayName: 'Archive files in staging'
             inputs:
               # rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
-              rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
+              rootFolderOrFile: $(Build.ArtifactStagingDirectory)
               includeRootFolder: false
               archiveType: zip
               archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
@@ -111,8 +100,8 @@ stages:
           - task: PublishBuildArtifacts@1
             displayName: 'Publish build artifact: $(artifactName)'
             inputs:
-              pathtoPublish: '$(Build.ArtifactStagingDirectory)'
-              artifactName: '$(artifactName)'
+              pathtoPublish: $(Build.ArtifactStagingDirectory)
+              artifactName: $(artifactName)
 
           - task: CmdLine@2
             displayName: 'List contents of staging directory'
@@ -134,18 +123,14 @@ stages:
           runOnce:
             deploy:
               steps:
-                # # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/download-build-artifacts-v0
-                # - download: current
-                #   artifact: drop
-                #   displayName: 'Download artifact'
-
-                # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/download-build-artifacts-v1
-                - task: DownloadBuildArtifacts@1
-                  inputs:
-                    buildType: 'current'
-                    downloadType: 'single'
-                    artifactName: '$(artifactName)'
-                    downloadPath: '$(System.ArtifactsDirectory)'
+                # Already handled automatically by Pipeline
+                # # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/download-build-artifacts-v1
+                # - task: DownloadBuildArtifacts@1
+                #   inputs:
+                #     buildType: 'current'
+                #     downloadType: 'single'
+                #     artifactName: '$(artifactName)'
+                #     downloadPath: '$(System.ArtifactsDirectory)'
 
                 # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/cmd-line-v2
                 - task: CmdLine@2
@@ -159,6 +144,8 @@ stages:
                       ls $(Pipeline.Workspace)
                       echo --- $(Pipeline.Workspace)/$(artifactName) ---
                       ls $(Pipeline.Workspace)/$(artifactName)
+                      echo $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+                      echo $(Pipeline.Workspace)/$(Build.BuildId).zip
                   # pwd -> /home/vsts/work/1/s
                   # $(Pipeline.Workspace) -> /home/vsts/work/1
 
