@@ -86,13 +86,13 @@ stages:
           - task: CopyFiles@2
             displayName: 'Copy files to staging'
             inputs:
-              SourceFolder: '$(workingDirectory)'
-              Contents: |
+              # sourceFolder: '$(workingDirectory)' # adds to end of working dir
+              contents: |
                 **/*
                 !node_modules/**
               # !*.md
               # !*.yml
-              TargetFolder: '$(Build.ArtifactStagingDirectory)'
+              targetFolder: '$(Build.ArtifactStagingDirectory)/dist'
 
           # ------------------------ Artifact Publish Steps ------------------------
           # Provide files to next stage
@@ -100,7 +100,7 @@ stages:
           - task: PublishBuildArtifacts@1
             displayName: 'Publish build artifact: drop'
             inputs:
-              pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              pathtoPublish: '$(Build.ArtifactStagingDirectory)/dist'
               artifactName: 'drop'
 
           - task: CmdLine@2
@@ -108,6 +108,7 @@ stages:
             inputs:
               script: |
                 ls $(Build.ArtifactStagingDirectory)
+                ls $(Build.ArtifactStagingDirectory)/dist
 
   - stage: Deploy
     displayName: Deploy stage
