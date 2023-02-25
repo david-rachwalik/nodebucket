@@ -11,11 +11,11 @@ variables:
   nodeVersion: '16' # '14.x'
   runtimeStack: 'NODE|16'
   subscriptionName: 'Pay-As-You-Go' # Pipeline connection (ARM)
-  appServiceName: '' # web app name
+  appServiceName: 'webapp-nodebucket' # web app name
   # webApp (default), api, functionApp, dockerContainer, aspnetcore
   # webAppLinux, node, aspnetcore, python, java, ruby, tomcat
   # appServiceType: 'node' # webAppLinux for general Linux web app
-  environmentName: ''
+  environmentName: 'Production'
 
 stages:
   - stage: Build
@@ -26,6 +26,15 @@ stages:
         pool:
           vmImage: $(vmImageName)
         steps:
+          - task: CmdLine@2
+            displayName: 'Print working directory'
+            inputs:
+              script: |
+                echo Write your commands here
+                pwd
+                echo Hello world
+            # pwd -> /home/vsts/work/1/s
+
           - task: NodeTool@0
             displayName: 'Install Node.js'
             inputs:
@@ -63,6 +72,15 @@ stages:
           runOnce:
             deploy:
               steps:
+                - task: CmdLine@2
+                  displayName: 'Print working directory'
+                  inputs:
+                    script: |
+                      echo Write your commands here
+                      pwd
+                      echo Hello world
+                  # pwd -> /home/vsts/work/1/s
+
                 - task: AzureWebApp@1
                   displayName: 'Azure Web App Deploy: '
                   inputs:
