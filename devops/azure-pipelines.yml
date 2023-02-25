@@ -52,7 +52,7 @@ stages:
             displayName: 'Install app dependencies'
 
           - script: |
-              npm run build:prod
+              npm run build
             displayName: 'Build app (prod)'
 
           - task: ArchiveFiles@2
