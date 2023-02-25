@@ -81,14 +81,15 @@ stages:
                 server/**
                 dist/**
                 *
-              targetFolder: $(Build.ArtifactStagingDirectory)
+              # targetFolder: $(Build.ArtifactStagingDirectory)
+              targetFolder: $(System.DefaultWorkingDirectory)/_$(artifactName)
 
           # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/archive-files-v2
           - task: ArchiveFiles@2
             displayName: 'Archive files in staging'
             inputs:
-              # rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
-              rootFolderOrFile: $(Build.ArtifactStagingDirectory)
+              # rootFolderOrFile: $(Build.ArtifactStagingDirectory)
+              rootFolderOrFile: $(System.DefaultWorkingDirectory)/_$(artifactName)
               includeRootFolder: false
               archiveType: zip
               archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
