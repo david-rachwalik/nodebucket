@@ -87,12 +87,16 @@ stages:
             displayName: 'Copy files to staging'
             inputs:
               # sourceFolder: '$(workingDirectory)' # adds to end of working dir
+              # contents: |
+              #   **/*
+              #   !node_modules/**
+              # # !*.md
+              # # !*.yml
               contents: |
-                **/*
-                !node_modules/**
-              # !*.md
-              # !*.yml
-              targetFolder: '$(Build.ArtifactStagingDirectory)/dist'
+                server/**
+                dist/**
+                *
+              targetFolder: '$(Build.ArtifactStagingDirectory)'
 
           # ------------------------ Artifact Publish Steps ------------------------
           # Provide files to next stage
@@ -100,15 +104,14 @@ stages:
           - task: PublishBuildArtifacts@1
             displayName: 'Publish build artifact: drop'
             inputs:
-              pathtoPublish: '$(Build.ArtifactStagingDirectory)/dist'
+              pathtoPublish: '$(Build.ArtifactStagingDirectory)'
               artifactName: 'drop'
 
           - task: CmdLine@2
-            displayName: 'List contents of working directory'
+            displayName: 'List contents of staging directory'
             inputs:
               script: |
                 ls $(Build.ArtifactStagingDirectory)
-                ls $(Build.ArtifactStagingDirectory)/dist
 
   - stage: Deploy
     displayName: Deploy stage
@@ -143,7 +146,7 @@ stages:
                     appName: $(appServiceName)
                     package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
                     runtimeStack: '$(runtimeStack)'
-                    startUpCommand: 'npm run start'
+                    startUpCommand: 'npm start'
                     deploymentMethod: 'auto'
                     # ensure fully loaded and ready to serve requests before deployment is complete
                     # additionalDeploymentOptions: '--warmup-path /'
