@@ -12,9 +12,6 @@ variables:
   runtimeStack: 'NODE|16'
   subscriptionName: 'Pay-As-You-Go' # Pipeline connection (ARM)
   appServiceName: 'webapp-nodebucket' # web app name
-  # webApp (default), api, functionApp, dockerContainer, aspnetcore
-  # webAppLinux, node, aspnetcore, python, java, ruby, tomcat
-  # appServiceType: 'node' # webAppLinux for general Linux web app
   environmentName: 'Production'
 
 stages:
@@ -55,18 +52,62 @@ stages:
               npm run build
             displayName: 'Build app (prod)'
 
-          - task: ArchiveFiles@2
-            displayName: 'Archive files'
+          - task: CmdLine@2
+            displayName: 'List contents of working directory'
             inputs:
-              rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
-              includeRootFolder: false
-              archiveType: zip
-              archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-              replaceExistingArchive: true
-              exclude: 'node_modules/**'
+              script: |
+                ls
 
-          - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-            artifact: drop
+          # # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/archive-files-v2
+          # - task: ArchiveFiles@2
+          #   displayName: 'Archive files'
+          #   inputs:
+          #     rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+          #     includeRootFolder: false
+          #     archiveType: zip
+          #     archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+          #     replaceExistingArchive: true
+
+          #     # # Exclude node_modules directory
+          #     # modifyArchPath: true
+          #     # archiveBaseDirectory: '.'
+          #     # # Exclude node_modules directory
+          #     # exclude: 'node_modules/**'
+
+          # - task: ArchiveFiles@2
+          #   displayName: 'Archive files'
+          #   inputs:
+          #     rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
+
+          # - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+          #   artifact: drop
+
+          # https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/copy-files
+          - task: CopyFiles@2
+            displayName: 'Copy files to staging'
+            inputs:
+              SourceFolder: '$(workingDirectory)'
+              Contents: |
+                **/*
+                !node_modules/**
+              # !*.md
+              # !*.yml
+              TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+          # ------------------------ Artifact Publish Steps ------------------------
+          # Provide files to next stage
+          # https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/publish-build-artifacts
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish build artifact: drop'
+            inputs:
+              pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              artifactName: 'drop'
+
+          - task: CmdLine@2
+            displayName: 'List contents of working directory'
+            inputs:
+              script: |
+                ls $(Build.ArtifactStagingDirectory)
 
   - stage: Deploy
     displayName: Deploy stage
@@ -89,18 +130,20 @@ stages:
                       echo Write your commands here
                       pwd
                       echo Hello world
+                      echo $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
                   # pwd -> /home/vsts/work/1/s
 
+                # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/azure-web-app-v1
                 - task: AzureWebApp@1
                   displayName: 'Azure Web App Deploy: '
                   inputs:
                     azureSubscription: $(subscriptionName)
-                    appName: $(appServiceName)
-                    # appType: '$(appServiceType)'
                     appType: 'webAppLinux' # webApp|webAppLinux
-                    runtimeStack: '$(runtimeStack)'
+                    appName: $(appServiceName)
                     package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
-                    startUpCommand: 'npm start'
+                    runtimeStack: '$(runtimeStack)'
+                    startUpCommand: 'npm run start'
+                    deploymentMethod: 'auto'
                     # ensure fully loaded and ready to serve requests before deployment is complete
                     # additionalDeploymentOptions: '--warmup-path /'
 
