@@ -15,7 +15,7 @@ variables:
   # webApp (default), api, functionApp, dockerContainer, aspnetcore
   # webAppLinux, node, aspnetcore, python, java, ruby, tomcat
   # appServiceType: 'node' # webAppLinux for general Linux web app
-  # environmentName: ''
+  environmentName: ''
 
 stages:
   - stage: Build
@@ -56,7 +56,7 @@ stages:
     jobs:
       - deployment: Deploy
         displayName: Deploy
-        # environment: $(environmentName)
+        environment: $(environmentName)
         pool:
           vmImage: $(vmImageName)
         strategy:
