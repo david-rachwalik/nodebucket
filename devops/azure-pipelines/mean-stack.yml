@@ -12,15 +12,15 @@ variables:
   runtimeStack: 'NODE|16-lts'
   subscriptionName: 'Pay-As-You-Go' # Pipeline connection (ARM)
   appServiceName: 'webapp-nodebucket' # web app name
-  environmentName: 'Production'
   artifactName: 'drop'
+  environmentName: 'Production'
 
 stages:
-  - stage: Build
-    displayName: Build stage
+  - stage: 'Build'
+    displayName: 'Build stage'
     jobs:
-      - job: Build
-        displayName: Build
+      - job: 'Build'
+        displayName: 'Build'
         pool:
           vmImage: $(vmImageName)
         steps:
@@ -36,7 +36,9 @@ stages:
             inputs:
               versionSpec: $(nodeVersion)
 
-          - script: npm install
+          - script: |
+              cd client-angular
+              npm install
             displayName: 'Install app dependencies'
 
           - script: npm run build
@@ -47,25 +49,6 @@ stages:
 
           - script: ls
             displayName: 'List contents of working directory'
-
-          # # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/archive-files-v2
-          # - task: ArchiveFiles@2
-          #   displayName: 'Archive files'
-          #   inputs:
-          #     rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
-          #     includeRootFolder: false
-          #     archiveType: zip
-          #     archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-          #     replaceExistingArchive: true
-
-          #     # # Exclude node_modules directory
-          #     # modifyArchPath: true
-          #     # archiveBaseDirectory: '.'
-          #     # # Exclude node_modules directory
-          #     # exclude: 'node_modules/**'
-
-          # - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-          #   artifact: drop
 
           # https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/copy-files
           - task: CopyFiles@2
@@ -79,7 +62,7 @@ stages:
               # # !*.yml
               contents: |
                 server/**
-                dist/**
+                **/dist/**
                 *
               # targetFolder: $(Build.ArtifactStagingDirectory)
               targetFolder: $(System.DefaultWorkingDirectory)/_$(artifactName)
@@ -91,9 +74,17 @@ stages:
               # rootFolderOrFile: $(Build.ArtifactStagingDirectory)
               rootFolderOrFile: $(System.DefaultWorkingDirectory)/_$(artifactName)
               includeRootFolder: false
-              archiveType: zip
+              archiveType: 'zip'
               archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
               replaceExistingArchive: true
+
+          - task: CopyFiles@2
+            displayName: 'Copy deployment to staging'
+            inputs:
+              contents: |
+                devops/azuredeploy.json
+                devops/azuredeploy.parameters.json
+              targetFolder: $(Build.ArtifactStagingDirectory)
 
           # ------------------------ Artifact Publish Steps ------------------------
           # Provide files to next stage
@@ -107,13 +98,13 @@ stages:
           - script: ls $(Build.ArtifactStagingDirectory)
             displayName: 'List contents of staging directory'
 
-  - stage: Deploy
-    displayName: Deploy stage
-    dependsOn: Build
+  - stage: 'Deploy'
+    displayName: 'Deploy stage'
+    dependsOn: 'Build'
     condition: succeeded()
     jobs:
-      - deployment: Deploy
-        displayName: Deploy
+      - deployment: 'Deploy'
+        displayName: 'Deploy'
         environment: $(environmentName)
         pool:
           vmImage: $(vmImageName)
@@ -139,6 +130,7 @@ stages:
                       ls $(Pipeline.Workspace)
                       echo --- $(Pipeline.Workspace)/$(artifactName) ---
                       ls $(Pipeline.Workspace)/$(artifactName)
+                      echo ---
                       echo $(Build.ArtifactStagingDirectory)
                       echo $(System.DefaultWorkingDirectory)
                   # pwd -> /home/vsts/work/1/s
@@ -146,15 +138,24 @@ stages:
                   # $(Build.ArtifactStagingDirectory) -> /home/vsts/work/1/a
                   # $(System.DefaultWorkingDirectory) -> /home/vsts/work/1/s
 
+                - task: AzureResourceGroupDeployment@2
+                  displayName: 'Deploy ARM template'
+                  inputs:
+                    azureSubscription: $(subscriptionName)
+                    resourceGroupName: $(resourceGroupName)
+                    location: $(location)
+                    csmFile: $(Pipeline.Workspace)/$(artifactName)/devops/azuredeploy.json
+                    csmParametersFile: $(Pipeline.Workspace)/$(artifactName)/devops/azuredeploy.parameters.json
+
                 # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/azure-web-app-v1
                 - task: AzureWebApp@1
                   displayName: 'Deploy web app'
                   inputs:
-                    azureSubscription: '$(subscriptionName)'
+                    azureSubscription: $(subscriptionName)
                     appType: 'webAppLinux' # webApp|webAppLinux
-                    appName: '$(appServiceName)'
-                    package: '$(Pipeline.Workspace)/$(artifactName)/$(Build.BuildId).zip'
-                    runtimeStack: '$(runtimeStack)'
+                    appName: $(appServiceName)
+                    package: $(Pipeline.Workspace)/$(artifactName)/$(Build.BuildId).zip
+                    runtimeStack: $(runtimeStack)
                     startUpCommand: 'npm start'
                     deploymentMethod: 'auto'
                     # ensure fully loaded and ready to serve requests before deployment is complete

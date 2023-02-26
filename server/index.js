@@ -46,8 +46,15 @@ const app = express();
 // --- Configure middleware ---
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, '../dist/nodebucket')));
-app.use('/', express.static(path.join(__dirname, '../dist/nodebucket')));
+// app.use(express.static(path.join(__dirname, '../dist/nodebucket')));
+// app.use('/', express.static(path.join(__dirname, '../dist/nodebucket')));
+app.use(
+  express.static(path.join(__dirname, '../client-angular/dist/nodebucket')),
+);
+app.use(
+  '/',
+  express.static(path.join(__dirname, '../client-angular/dist/nodebucket')),
+);
 
 // Configure OpenAPI/Swagger document library specification (https://swagger.io/specification)
 const options = {

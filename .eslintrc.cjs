@@ -13,7 +13,8 @@ module.exports = {
   // https://stackoverflow.com/questions/53189200/whats-the-difference-between-plugins-and-extends-in-eslint
   extends: [
     'eslint:recommended',
-    'airbnb',
+    'plugin:import/recommended',
+    'airbnb-base', // https://github.com/airbnb/javascript/tree/master/packages/eslint-config-airbnb-base
     'plugin:prettier/recommended', // mods Prettier errors to throw ESLint errors (always last)
   ],
   parserOptions: {
@@ -25,6 +26,7 @@ module.exports = {
     // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
     'no-console': 'off',
     'import/prefer-default-export': 'off',
+    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     'class-methods-use-this': 'off',
     'no-underscore-dangle': 'off',
   },
@@ -39,14 +41,13 @@ module.exports = {
       extends: [
         'plugin:@typescript-eslint/recommended', // Uses the recommended rules from @typescript-eslint/eslint-plugin
         'plugin:@typescript-eslint/recommended-requiring-type-checking',
-        'airbnb-typescript/base',
+        'airbnb-typescript/base', // https://github.com/iamturns/eslint-config-airbnb-typescript
       ],
       parser: '@typescript-eslint/parser',
-      // parserOptions: { project: ['./tsconfig.json'] },
       // https://stackoverflow.com/questions/64933543/parsing-error-cannot-read-file-tsconfig-json-eslint
       parserOptions: {
         project: 'tsconfig.json',
-        tsconfigRootDir: __dirname,
+        tsconfigRootDir: `${__dirname}/client-angular`,
         sourceType: 'module',
       },
       rules: {

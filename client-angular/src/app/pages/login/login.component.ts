@@ -7,13 +7,13 @@
 ;===========================================
 */
 
-import { HttpEvent, HttpHandler, HttpRequest } from '@angular/common/http';
+// import { HttpEvent, HttpHandler, HttpRequest } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { Message } from 'primeng/api';
-import { Observable } from 'rxjs';
+// import { Observable } from 'rxjs';
 
 import { Employee } from 'src/app/shared/models/employee.interface';
 import { SessionService } from 'src/app/shared/services/session.service';
@@ -45,12 +45,12 @@ export class LoginComponent implements OnInit {
   ) {
     this.employee = {} as Employee;
   }
-  intercept(
-    req: HttpRequest<any>,
-    next: HttpHandler,
-  ): Observable<HttpEvent<any>> {
-    throw new Error('Method not implemented.');
-  }
+  // intercept(
+  //   req: HttpRequest<any>,
+  //   next: HttpHandler,
+  // ): Observable<HttpEvent<any>> {
+  //   throw new Error('Method not implemented.');
+  // }
 
   ngOnInit(): void {}
 
@@ -60,7 +60,8 @@ export class LoginComponent implements OnInit {
 
     this.sessionService.findEmployeeById(empId).subscribe({
       next: (res) => {
-        if (res) {
+        console.log('res.data: ', res.data);
+        if (res && res.data) {
           // Store successful response to employee
           this.employee = res.data;
 
