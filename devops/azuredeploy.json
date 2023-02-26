@@ -10,6 +10,13 @@
         "description": "Application name."
       }
     },
+    "linuxFxVersion": {
+      "type": "string",
+      "defaultValue": "NODE|lts",
+      "metadata": {
+        "description": "The Runtime stack of current web app"
+      }
+    },
     "sku": {
       "type": "string",
       "allowedValues": [
@@ -30,34 +37,14 @@
       "metadata": {
         "description": "The pricing tier for the hosting plan."
       }
-    },
-    "linuxFxVersion": {
-      "type": "string",
-      "defaultValue": "NODE|lts",
-      "metadata": {
-        "description": "The Runtime stack of current web app"
-      }
-    },
-    "repoUrl": {
-      "type": "string",
-      "defaultValue": " ",
-      "metadata": {
-        "description": "Optional - URL for the GitHub repository that contains the project to deploy."
-      }
-    },
-    "repoBranch": {
-      "type": "string",
-      "defaultValue": "master",
-      "metadata": {
-        "description": "Optional - The branch of the GitHub repository to use."
-      }
     }
   },
   "functions": [],
   "variables": {
     "location": "[resourceGroup().location]",
-    "webAppName": "[format('webapp-{0}', parameters('appName'))]",
-    "appServicePlanName": "[format('asp-{0}', parameters('appName'))]"
+    // "webAppName": "[format('webapp-{0}', parameters('appName'))]",
+    // "appServicePlanName": "[format('asp-{0}', parameters('appName'))]"
+    "appServicePlanName": "[format('asp-{0}_{1}', parameters('sku'), resourceGroup().location)]"
   },
   "resources": [
     {
@@ -79,7 +66,8 @@
       // https://learn.microsoft.com/en-us/azure/templates/microsoft.web/sites
       "type": "Microsoft.Web/sites",
       "apiVersion": "2022-03-01",
-      "name": "[variables('webAppName')]",
+      // "name": "[variables('webAppName')]",
+      "name": "[parameters('appName')]",
       "location": "[variables('location')]",
       "identity": {
         "type": "SystemAssigned"
