@@ -12,23 +12,9 @@
     },
     "sku": {
       "type": "string",
-      "allowedValues": [
-        "F1",
-        "D1",
-        "B1",
-        "B2",
-        "B3",
-        "S1",
-        "S2",
-        "S3",
-        "P1",
-        "P2",
-        "P3",
-        "P4"
-      ],
       "defaultValue": "F1",
       "metadata": {
-        "description": "The pricing tier for the hosting plan."
+        "description": "The SKU of App Service Plan."
       }
     },
     "linuxFxVersion": {
@@ -36,20 +22,6 @@
       "defaultValue": "NODE|lts",
       "metadata": {
         "description": "The Runtime stack of current web app"
-      }
-    },
-    "repoUrl": {
-      "type": "string",
-      "defaultValue": " ",
-      "metadata": {
-        "description": "Optional - URL for the GitHub repository that contains the project to deploy."
-      }
-    },
-    "repoBranch": {
-      "type": "string",
-      "defaultValue": "master",
-      "metadata": {
-        "description": "Optional - The branch of the GitHub repository to use."
       }
     }
   },

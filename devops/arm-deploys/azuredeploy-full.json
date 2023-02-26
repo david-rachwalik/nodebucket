@@ -86,7 +86,7 @@
     {
       // https://learn.microsoft.com/en-us/azure/templates/microsoft.web/sites/sourcecontrols
       // "condition": "[contains(parameters('repoUrl'), 'http')]",
-      // Plans that support deployment slots: Standard and above - Basic and Free plans do not
+      // Only Standard tier and above support deployment slots for zero downtime swaps
       "condition": "[and(
         contains(parameters('repoUrl'), 'http'),
         or(

@@ -9,13 +9,11 @@ trigger:
 variables:
   vmImageName: 'ubuntu-latest' # agent VM image name
   nodeVersion: '16' # '14.x'
-  runtimeStack: 'NODE|16'
+  runtimeStack: 'NODE|16-lts'
   subscriptionName: 'Pay-As-You-Go' # Pipeline connection (ARM)
-  appServiceName: '' # web app name
-  # webApp (default), api, functionApp, dockerContainer, aspnetcore
-  # webAppLinux, node, aspnetcore, python, java, ruby, tomcat
-  appServiceType: 'node' # webAppLinux for general Linux web app
-  # environmentName: ''
+  appServiceName: 'webapp-nodebucket' # web app name
+  environmentName: 'Production'
+  artifactName: 'drop'
 
 stages:
   - stage: Build
@@ -26,28 +24,88 @@ stages:
         pool:
           vmImage: $(vmImageName)
         steps:
+          # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/cmd-line-v2
+          - script: |
+              echo Hello world
+              pwd
+            # pwd -> /home/vsts/work/1/s
+            displayName: 'Print working directory'
+
           - task: NodeTool@0
             displayName: 'Install Node.js'
             inputs:
               versionSpec: $(nodeVersion)
 
-          - script: |
-              npm install
-              npm run build --if-present
-              npm run test --if-present
-            displayName: 'npm install, build and test'
+          - script: npm install
+            displayName: 'Install app dependencies'
 
-          - task: ArchiveFiles@2
-            displayName: 'Archive files'
+          - script: npm run build
+            displayName: 'Build app (prod)'
+
+          # - script: npm run test --if-present
+          #   displayName: 'Test app'
+
+          - script: ls
+            displayName: 'List contents of working directory'
+
+          # # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/archive-files-v2
+          # - task: ArchiveFiles@2
+          #   displayName: 'Archive files'
+          #   inputs:
+          #     rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+          #     includeRootFolder: false
+          #     archiveType: zip
+          #     archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+          #     replaceExistingArchive: true
+
+          #     # # Exclude node_modules directory
+          #     # modifyArchPath: true
+          #     # archiveBaseDirectory: '.'
+          #     # # Exclude node_modules directory
+          #     # exclude: 'node_modules/**'
+
+          # - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+          #   artifact: drop
+
+          # https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/copy-files
+          - task: CopyFiles@2
+            displayName: 'Copy files to staging'
             inputs:
-              rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+              # sourceFolder: '$(workingDirectory)' # adds to end of working dir
+              # contents: |
+              #   **/*
+              #   !node_modules/**
+              # # !*.md
+              # # !*.yml
+              contents: |
+                server/**
+                dist/**
+                *
+              # targetFolder: $(Build.ArtifactStagingDirectory)
+              targetFolder: $(System.DefaultWorkingDirectory)/_$(artifactName)
+
+          # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/archive-files-v2
+          - task: ArchiveFiles@2
+            displayName: 'Archive files in staging'
+            inputs:
+              # rootFolderOrFile: $(Build.ArtifactStagingDirectory)
+              rootFolderOrFile: $(System.DefaultWorkingDirectory)/_$(artifactName)
               includeRootFolder: false
               archiveType: zip
               archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
               replaceExistingArchive: true
 
-          - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-            artifact: drop
+          # ------------------------ Artifact Publish Steps ------------------------
+          # Provide files to next stage
+          # https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/publish-build-artifacts
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish build artifact: $(artifactName)'
+            inputs:
+              pathtoPublish: $(Build.ArtifactStagingDirectory)
+              artifactName: $(artifactName)
+
+          - script: ls $(Build.ArtifactStagingDirectory)
+            displayName: 'List contents of staging directory'
 
   - stage: Deploy
     displayName: Deploy stage
@@ -56,22 +114,49 @@ stages:
     jobs:
       - deployment: Deploy
         displayName: Deploy
-        # environment: $(environmentName)
+        environment: $(environmentName)
         pool:
           vmImage: $(vmImageName)
         strategy:
           runOnce:
             deploy:
               steps:
-                - task: AzureWebApp@1
-                  displayName: 'Azure Web App Deploy: '
+                # Already handled automatically by Pipeline
+                # # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/download-build-artifacts-v1
+                # - task: DownloadBuildArtifacts@1
+                #   inputs:
+                #     buildType: 'current'
+                #     downloadType: 'single'
+                #     artifactName: '$(artifactName)'
+                #     downloadPath: '$(System.ArtifactsDirectory)'
+
+                # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/cmd-line-v2
+                - task: CmdLine@2
+                  displayName: 'Print pipeline directory'
                   inputs:
-                    azureSubscription: $(subscriptionName)
-                    appName: $(appServiceName)
-                    appType: $(appServiceType)
+                    script: |
+                      echo --- $(Pipeline.Workspace) ---
+                      ls $(Pipeline.Workspace)
+                      echo --- $(Pipeline.Workspace)/$(artifactName) ---
+                      ls $(Pipeline.Workspace)/$(artifactName)
+                      echo $(Build.ArtifactStagingDirectory)
+                      echo $(System.DefaultWorkingDirectory)
+                  # pwd -> /home/vsts/work/1/s
+                  # $(Pipeline.Workspace) -> /home/vsts/work/1
+                  # $(Build.ArtifactStagingDirectory) -> /home/vsts/work/1/a
+                  # $(System.DefaultWorkingDirectory) -> /home/vsts/work/1/s
+
+                # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/azure-web-app-v1
+                - task: AzureWebApp@1
+                  displayName: 'Deploy web app'
+                  inputs:
+                    azureSubscription: '$(subscriptionName)'
+                    appType: 'webAppLinux' # webApp|webAppLinux
+                    appName: '$(appServiceName)'
+                    package: '$(Pipeline.Workspace)/$(artifactName)/$(Build.BuildId).zip'
                     runtimeStack: '$(runtimeStack)'
-                    package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
                     startUpCommand: 'npm start'
+                    deploymentMethod: 'auto'
                     # ensure fully loaded and ready to serve requests before deployment is complete
                     # additionalDeploymentOptions: '--warmup-path /'
 

@@ -10,7 +10,7 @@ variables:
   vmImageName: 'ubuntu-latest' # agent VM image name
   runtimeStack: 'NODE|16-lts' # use LTS for Production
   subscriptionName: 'Pay-As-You-Go' # Pipeline connection (ARM)
-  location: 'southcentralus' # 'eastus'
+  location: 'eastus' # 'southcentralus'
   resourceGroupName: 'rg-nodebucket'
   appServiceName: 'webapp-nodebucket' # web app name
   artifactName: 'drop'
@@ -36,14 +36,8 @@ stages:
           - task: CopyFiles@2
             displayName: 'Copy files to staging'
             inputs:
-              # contents: |
-              #   **/*
-              #   !node_modules/**
-              # # !*.md
-              # # !*.yml
               contents: |
                 server/**
-                dist/**
                 *
               targetFolder: $(System.DefaultWorkingDirectory)/_$(artifactName)
 

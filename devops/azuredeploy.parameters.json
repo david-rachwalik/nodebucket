@@ -6,10 +6,10 @@
       "value": "nodebucket"
     },
     "linuxFxVersion": {
-      "value": "NODE|16"
+      "value": "NODE|16-lts"
     },
     "repoUrl": {
-      "value": "https://github.com/david-rachwalik/nodebucket"
+      "value": "https://github.com/david-rachwalik/nodebucket.git"
     },
     "repoBranch": {
       "value": "main"
