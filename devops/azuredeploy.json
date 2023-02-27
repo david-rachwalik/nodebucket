@@ -105,7 +105,6 @@
     },
     "connectionStrings": {
       "type": "array",
-      // "value": "[reference(parameters('appName')).siteConfig.connectionStrings]"
       "value": "[coalesce(reference(parameters('appName')).siteConfig.connectionStrings, json('[]'))]"
     }
   }

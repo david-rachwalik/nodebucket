@@ -1,18 +1,20 @@
-# Node.js Express Web App to Linux on Azure
-# Build a Node.js Express app and deploy it to Azure as a Linux web app.
-# Add steps that analyze code, save build artifacts, deploy, and more:
+# Build a Node.js server and deploy to Azure App Service (Linux)
+# - tech stack: Node.js, Express
+
+# Analyze code, save build artifacts, and deploy
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 
 trigger:
   - main
 
 variables:
-  vmImageName: 'ubuntu-latest' # agent VM image name
+  location: 'southcentralus' # 'eastus'
+  resourceGroupName: 'rg-dev-southcentralus'
+  appServiceName: 'nodebucket' # web app name
+
   runtimeStack: 'NODE|16-lts' # use LTS for Production
   subscriptionName: 'Pay-As-You-Go' # Pipeline connection (ARM)
-  location: 'eastus' # 'southcentralus'
-  resourceGroupName: 'rg-nodebucket'
-  appServiceName: 'webapp-nodebucket' # web app name
+  vmImageName: 'ubuntu-latest' # agent VM image name
   artifactName: 'drop'
   environmentName: 'Production'
 
@@ -32,6 +34,9 @@ stages:
             # pwd -> /home/vsts/work/1/s
             displayName: 'Print working directory'
 
+          - script: ls
+            displayName: 'List contents of working directory'
+
           # https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/copy-files
           - task: CopyFiles@2
             displayName: 'Copy files to staging'
@@ -39,6 +44,8 @@ stages:
               contents: |
                 server/**
                 *
+                !*.git*
+                !*.cjs
               targetFolder: $(System.DefaultWorkingDirectory)/_$(artifactName)
 
           # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/archive-files-v2

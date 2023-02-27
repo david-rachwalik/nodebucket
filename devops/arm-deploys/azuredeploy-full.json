@@ -95,7 +95,15 @@
         "siteConfig": {
           "linuxFxVersion": "[parameters('linuxFxVersion')]",
           "minTlsVersion": "1.2",
-          "ftpsState": "FtpsOnly"
+          "ftpsState": "FtpsOnly",
+          // Enable production-specific behavior, such as caching or error handling
+          // https://docs.npmjs.com/cli/v8/commands/npm-install#omit
+          "appSettings": [
+            {
+              "name": "NODE_ENV",
+              "value": "production"
+            }
+          ]
         }
       }
     },
@@ -127,5 +135,18 @@
       ]
     }
   ],
-  "outputs": {}
+  "outputs": {
+    "appServicePlanId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+    },
+    "webAppName": {
+      "type": "string",
+      "value": "[concat('https://', reference(parameters('appName')).defaultHostName)]"
+    },
+    "connectionStrings": {
+      "type": "array",
+      "value": "[coalesce(reference(parameters('appName')).siteConfig.connectionStrings, json('[]'))]"
+    }
+  }
 }
